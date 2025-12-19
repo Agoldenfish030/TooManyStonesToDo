@@ -1,19 +1,25 @@
 import './App.css';
 
+const authenticationSuccess = function() {
+  console.log('Successful authentication');
+};
+
+const authenticationFailure = function() {
+  console.log('Failed authentication');
+};
+
 function App() {
-  const handleLogin = async()=>{
-    try{
-      const linkResponse = await fetch('https://toomuchstonestodo.onrender.com/getTrello', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      const res = await linkResponse.json();
-      window.location.href = res.url;
-    }catch(err){
-      console.error('取得網址失敗：' ,err);
-    }
+  const handleLogin = ()=>{
+      window.Trello.authorize({
+      type: 'popup',
+      name: 'Getting Started Application',
+      scope: {
+        read: 'true',
+        write: 'true' },
+      expiration: 'never',
+      success: authenticationSuccess,
+      error: authenticationFailure
+    });
   }
   
   return (
