@@ -6,7 +6,8 @@ const dotenv = require("dotenv");
 const crypto = require("crypto");
 dotenv.config();
 
-const dblink = process.env.DATABASE.replace('<db_password>', process.env.DATABASE_PASSWORD);
+const link = process.env.DATABASE;
+const dblink = link.replace('<db_password>', process.env.DATABASE_PASSWORD);
 mongoose.connect(dblink);
 const db = mongoose.connection;
 let dbConnection, smallDb;
