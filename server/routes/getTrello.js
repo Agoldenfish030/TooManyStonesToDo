@@ -7,7 +7,7 @@ router.get("/", (req, res)=>{
     const link = process.env.AUTHORIZE_URL;
     link.replace('<KEYWORD>', process.env.MY_API_KEY);
     if(!link) res.status(500).json({ message: "LINK LOST" });
-    res.json(link);
+    res.json({ url: link});
 });
 
 module.exports = router;

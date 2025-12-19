@@ -9,9 +9,8 @@ function App() {
           'Content-Type': 'application/json'
         }
       });
-      console.log(linkResponse);
-      const link = linkResponse.json();
-      window.location.href = link;
+      const res = linkResponse.json();
+      window.location.href = res.url;
     }catch(err){
       console.error('取得網址失敗：' ,err);
     }
