@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 const mongoose = require("mongoose");
-const { MongoClient } = require("mongodb");
 const dotenv = require("dotenv");
 const crypto = require("crypto");
 dotenv.config();
@@ -10,27 +9,9 @@ const link = process.env.DATABASE;
 const dblink = link.replace('<db_password>', process.env.DATABASE_PASSWORD);
 mongoose.connect(dblink);
 const db = mongoose.connection;
-let dbConnection, smallDb;
 
 db.on('error', console.error.bind(console, 'connection fails...'));
 db.once('open', function (){ console.log('connected...') });
-
-const connectToDb = async()=>{
-  try{
-    const client = await MongoClient.connect(dblink);
-    dbConnection = client.db('GameUsers');
-    console.log("已連接db collection");
-  }catch(err){
-    console.error("未連接db collection：", err);
-  }
-}
-
-const getDb = ()=>{
-  if(!dbConnection){
-    throw new Error("查無db collection");
-  }
-  return dbConnection;
-}
 
 const userSchema = new mongoose.Schema({
     token: {
@@ -45,7 +26,7 @@ const userSchema = new mongoose.Schema({
       type: Number,
       require: true
     }
-});
+}, { collation: 'gameUsers' });
 const User = mongoose.model('User', userSchema);
 
 /* GET users listing. */
@@ -63,17 +44,11 @@ router.post("/", async(req, res)=>{
   });
 
   try{
-    await connectToDb;
-    smallDb = getDb;
+    const response = await user.save();
+    res.status(201).json(response);
   }catch(err){
-    console.error("拿不到小Db：", err);
+    res.status(500).json({ error: err.message});
   }
-  smallDb.collection('gameUsers')
-    .insertOne(user)
-    .then(result => res.status(201).json(result))
-    .catch(err => {
-      res.status(500).json({ message: err});
-    });
 });
 
 module.exports = router;
