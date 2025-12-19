@@ -1,33 +1,20 @@
 import './App.css';
-import { useEffect } from 'react';
-
-const authenticationSuccess = function() {
-  console.log('Successful authentication');
-};
-
-const authenticationFailure = function() {
-  console.log('Failed authentication');
-};
-
-const handleLogin = ()=>{
-  window.Trello.authorize({
-    type: 'popup',
-    name: 'TooMuchStonesToDo_power-up',
-    scope: {
-      read: 'true',
-      write: 'true' },
-    expiration: 'never',
-    success: authenticationSuccess,
-    error: authenticationFailure
-  });
-}
 
 function App() {
-  useEffect(()=>{
-    const script = document.createElement('script');
-    script.src = `https://trello.com/1/client.js?key=${process.env.MY_API_KEY}`;
-    document.head.appendChild(script);
-  });
+  const handleLogin = async()=>{
+    try{
+      const linkResponse = await fetch('https://toomuchstonestodo.onrender.com/getTrello', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const link = await linkResponse.json();
+      window.location.href = link;
+    }catch(err){
+      console.error('取得網址失敗：' ,err);
+    }
+  }
   
   return (
     <div className="App">
