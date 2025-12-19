@@ -1,15 +1,15 @@
 import './App.css';
 
 function App() {
-  const handleLogin = async()=>{
+  const handleLogin = ()=>{
     try{
-      const linkResponse = await fetch('https://toomuchstonestodo.onrender.com/getTrello', {
+      const linkResponse = fetch('https://toomuchstonestodo.onrender.com/getTrello', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      const link = await linkResponse.json();
+      const link = linkResponse.json();
       window.location.href = link;
     }catch(err){
       console.error('取得網址失敗：' ,err);
