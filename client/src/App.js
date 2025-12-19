@@ -1,19 +1,8 @@
 import './App.css';
 
-const authenticationSuccess = async function() {
+const authenticationSuccess = function() {
   const token = window.Trello.token();
-  try{
-    const response = await fetch('https://toomuchstonestodo.onrender.com/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ token })
-    })
-    if(!response.ok) console.error("存入token失敗");
-  }catch(err){
-    console.error("存入token失敗：", err);
-  }
+  sessionStorage.setItem({'trelloToken': token});
   console.log('Successful authentication');
 };
 
