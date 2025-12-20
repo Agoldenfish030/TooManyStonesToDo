@@ -6,7 +6,6 @@ dotenv.config();
 router.get("/", async(req, res)=>{
     try{
         const link = process.env.AUTHORIZATION_LINK;
-        console.log(link);
         res.json({ reLink: link });
     }catch(err){
         res.status(500).json({ message: err.message });
