@@ -8,10 +8,10 @@ const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-const logInLinkRouter = require('./routes/logInLink');
+const logInLinkRouter = require('./routes/authorization/logInLink');
 const tokenRouter = require('./routes/userToken');
-const findUserRouter = require('./routes/findUser');
-const findIDRouter = require('./routes/findID');
+const findUserRouter = require('./routes/authorization/findUser');
+const findIDRouter = require('./routes/authorization/findID');
 
 var app = express();
 
