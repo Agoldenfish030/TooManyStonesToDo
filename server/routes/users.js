@@ -22,7 +22,7 @@ router.post('/', async(req, res, next)=>{
     userID: req.body.resID
   });
   try{
-    await user.save();
+    await user.save('userDatas');
   }catch(err){
     res.status(500).json("儲存user失敗：", err.message);
   }

@@ -27,6 +27,7 @@ const Token = mongoose.model('Token', tokenSchema);
 
 router.post("/", async(req, res)=>{
     //find id
+    const token = req.body.token;
     const response1 = await fetch('findID', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -41,24 +42,35 @@ router.post("/", async(req, res)=>{
         body: JSON.stringify({resID})
     });
     const found = await response2.json().found;
-    if(!found){}
+    if(!found){
+        const response3 = await fetch('users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({resID})
+        });
+        if(!response3.ok) res.status(500).json("回報：儲存user失敗");
+    }
 
     const userState = crypto.randomBytes(32).toString('hex');
-    const user = new Token({
+    const userToken = new Token({
         token: req.body.token,
         state: userState
     });
 
     try{
-        await user.save();
+        await userToken.save('userTokens');
         res.json({'userState': state});
     }catch(err){
-        res.status(500).json( "暫存token失敗：", err.message );
+        res.status(500).json("暫存token失敗：", err.message );
     }
 });
 
 router.delete("/", async(req, res)=>{
-
+    const delState = req.body.state;
+    db.collection('userTokens')
+        .deleteOne({state: delState})
+        .then(response => res.status(200).json("刪除暫存token成功"))
+        .catch(err => res.status(500).json({ message: err.message }));
 });
 
 module.exports = router;
