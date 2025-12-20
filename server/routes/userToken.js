@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const crypto = require('crypto');
+const { response } = require('../app');
 dotenv.config();
 mongoose.connect(process.env.DATABASE);
 const db = mongoose.connection;
@@ -24,6 +25,14 @@ const tokenSchema = new mongoose.Schema({
     }
 });
 const Token = mongoose.model('Token', tokenSchema);
+
+router.get("/", async(req, res)=>{
+    const reqState = req.body.state;
+    db.collection('userTokens')
+        .findOne({state: reqState})
+        .then(response => res.status(200).json(response))
+        .catch(err => res.status(400).json({ message: err.message }));
+});
 
 router.post("/", async(req, res)=>{
     //find id
