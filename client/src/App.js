@@ -1,8 +1,7 @@
 import './App.css';
+import { getBoards } from './trelloI/getBoards';
 
 const authenticationSuccess = function() {
-  const token = window.Trello.token();
-  sessionStorage.setItem({'trelloToken': token});
   console.log('Successful authentication');
 };
 
@@ -14,11 +13,11 @@ function App() {
   const handleLogin = ()=>{
       window.Trello.authorize({
       type: 'popup',
-      name: 'Getting Started Application',
+      name: 'TooMuchStonesToDo_power-up',
       scope: {
         read: 'true',
         write: 'true' },
-      expiration: 'never',
+      expiration: '1hour',
       success: authenticationSuccess,
       error: authenticationFailure
     });
@@ -30,6 +29,11 @@ function App() {
       <button onClick={handleLogin}>
         點我使用該死的授權
       </button>
+      <br />
+      <button onClick={getBoards}>
+        getBoards
+      </button>
+      <div></div>
     </div>
   );
 }

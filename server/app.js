@@ -8,7 +8,6 @@ const cors = require('cors');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-const firstRouter = require('./routes/getTrello');
 
 var app = express();
 
@@ -27,13 +26,12 @@ const corsOptions = {
     'http://localhost:3000'
   ],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 };
 app.use(cors(corsOptions));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/getTrello', firstRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
