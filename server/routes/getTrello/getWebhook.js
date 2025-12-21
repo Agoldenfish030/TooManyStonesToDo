@@ -1,5 +1,5 @@
-const fetch = require('node-fetch');
-const dotenv = require('dotenv');
+import fetch from 'node-fetch';
+import dotenv from 'dotenv';
 dotenv.config();
 
 const getWebhook = async({ userState })=>{
