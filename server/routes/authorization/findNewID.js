@@ -7,7 +7,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 router.get("/", async(req, res)=>{
-    await fetch(`https://api.trello.com/1/members/{id}?key=${process.env.APIKEY}&token=${req.body.token}`, {
+    await fetch(`https://api.trello.com/1/members/me?key=${process.env.APIKEY}&token=${req.body.token}`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json'

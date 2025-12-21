@@ -34,10 +34,10 @@ router.get("/", async(req, res)=>{
         .catch(err => res.status(400).json({ message: err.message }));
 });
 
-router.post("/", async(req, res)=>{
+router.post("/add", async(req, res)=>{
     //find id
     const token = req.body.token;
-    const response1 = await fetch('findID', {
+    const response1 = await fetch('findNewID', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({token})
@@ -45,7 +45,7 @@ router.post("/", async(req, res)=>{
     const resID = await response1.json().id;
 
     //find user是否有登入過
-    const response2 = await fetch('findUser', {
+    const response2 = await fetch('users/findUser', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({resID})

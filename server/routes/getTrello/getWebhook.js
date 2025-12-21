@@ -10,7 +10,7 @@ const getWebhook = async({ userState })=>{
     });
     const token = await userToken.json().token;
     const id = await userToken.json().userID;
-    const userData = await fetch('users', {
+    const userData = await fetch('users/findID', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({id})

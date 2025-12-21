@@ -20,11 +20,15 @@ const userSchema = new mongoose.Schema({
     mainBoardID: {
       type: String,
       require: true
+    },
+    cardUpdate: {
+      type: [String],
+      require: false
     }
 });
 const User = mongoose.model('User', userSchema);
 
-router.get("/", async(req, res)=>{
+router.get("/findID", async(req, res)=>{
   const userID = req.body.id;
   db.collection('userDatas')
     .findOne({userID: userID})
@@ -32,12 +36,21 @@ router.get("/", async(req, res)=>{
     .catch(err => res.status(400).json({message: err.message}));
 });
 
+router.get("/findUser", (req, res)=>{
+    const reqID = req.body.resID;
+    db.collection('userTokens')
+        .findOne({ userID: reqID })
+        .then(user => res.status(200).json({ found: true }) )
+        .catch(err => res.status(404).json({ found: false }) );
+});
+
 /* GET users listing. */
 router.post('/', async(req, res, next)=>{
   const user = new User({
     userID: req.body.resID,
     haveBoard: false,
-    mainBoardID: null
+    mainBoardID: null,
+    cardUpdate: []
   });
   try{
     await user.save('userDatas');
