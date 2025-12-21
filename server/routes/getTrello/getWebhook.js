@@ -16,7 +16,7 @@ const getWebhook = async({ userState })=>{
         body: JSON.stringify({id})
     });
     const boardID = await userData.json().mainBoardID;
-    const callbackURL = "https://toomuchstonestodo.onrender.com/trello/listenWebhook";
+    const callbackURL = "https://toomuchstonestodo.onrender.com/listenWebhook";
 
     fetch(`https://api.trello.com/1/tokens/${token}/webhooks/?key=${process.env.APIKEY}`, {
         method: 'POST',

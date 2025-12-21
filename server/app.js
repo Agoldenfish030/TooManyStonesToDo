@@ -28,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const corsOptions = {
   origin: [
-    'https://agoldenfish030.github.io/'
+    'https://stonereact-client.vercel.app/'
   ],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
