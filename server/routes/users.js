@@ -40,8 +40,8 @@ router.get("/findUser", (req, res)=>{
     const reqID = req.body.resID;
     db.collection('userTokens')
         .findOne({ userID: reqID })
-        .then(user => res.status(200).json({ found: true }) )
-        .catch(err => res.status(404).json({ found: false }) );
+        .then(user => res.json({ found: true }) )
+        .catch(err => res.json({ found: false }) );
 });
 
 /* GET users listing. */
