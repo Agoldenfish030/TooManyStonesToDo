@@ -1,5 +1,5 @@
-import fetch from 'node-fetch';
-import dotenv from 'dotenv';
+const fetch = require('node-fetch');
+const dotenv = require('dotenv');
 dotenv.config();
 
 const getWebhook = async({ userState })=>{
@@ -39,4 +39,4 @@ const getWebhook = async({ userState })=>{
         .catch(err => console.error(err));
     }
 
-export default getWebhook;
+module.exports = getWebhook;

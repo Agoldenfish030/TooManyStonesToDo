@@ -1,5 +1,3 @@
-import { response } from 'express';
-
 const fetch = require('node-fetch');
 const getDefault = async({ token, boardID })=>{
     try{
@@ -19,4 +17,4 @@ const getDefault = async({ token, boardID })=>{
     }
 }
 
-export default getDefault;
+module.exports = getDefault;
