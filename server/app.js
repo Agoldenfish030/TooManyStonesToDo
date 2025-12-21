@@ -28,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const corsOptions = {
   origin: [
-    'http://localhost:3000'
+    'https://agoldenfish030.github.io/'
   ],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
