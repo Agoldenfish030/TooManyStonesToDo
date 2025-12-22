@@ -45,7 +45,6 @@ router.post("/add", async(req, res)=>{
     });
     const resUser = await response1.json();
     const resID = resUser.id;
-    console.log(resID);
 
     //find user是否有登入過
     const found = await User.findOne({userID: resID});
@@ -56,6 +55,7 @@ router.post("/add", async(req, res)=>{
             mainBoardID: null,
             cardUpdate: []
         });
+        console.log("data: ", user.toObject());
         try{
             await user.save();
             res.json("儲存user成功");
