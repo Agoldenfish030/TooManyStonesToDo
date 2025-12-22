@@ -57,10 +57,9 @@ router.post("/add", async(req, res)=>{
             mainBoardID: null,
             cardUpdate: []
         });
-        console.log("新user: ", user.toObject());
         try{
-            await user.save();
-            console.log("儲存user成功");
+            const newUser = await user.save();
+            console.log("儲存user成功: ", newUser);
         }catch(err){
             res.status(500).json("儲存user失敗：", err.message);
         }
@@ -74,7 +73,8 @@ router.post("/add", async(req, res)=>{
     });
 
     try{
-        await userToken.save();
+        const newToken = await userToken.save();
+        console.log("儲存token成功: ", newToken);
         res.status(200).json({'userState': userState});
     }catch(err){
         res.status(500).json("暫存token失敗：", err.message );
