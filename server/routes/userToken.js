@@ -51,7 +51,7 @@ router.post("/add", async(req, res)=>{
 
         const resUser = await response1.json();
         const resID = resUser.id;
-        console.log("收到新用戶的trello id: ", resID);
+        console.log("收到用戶的trello id: ", resID);
 
         //find user是否有登入過
         const found = await User.findOne({userID: resID});
@@ -88,6 +88,7 @@ router.post("/add", async(req, res)=>{
 
 router.delete("/", async(req, res)=>{
     const delState = req.body.state;
+    console.log("將要刪除state: ", delState);
     await Token.deleteOne({state: delState})
         .then(response =>{
             console.log("刪除token成功！");
