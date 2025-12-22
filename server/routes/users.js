@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
       type: [String],
       require: false
     }
-});
+}, {collection: 'userDatas'});
 const User = mongoose.model('User', userSchema);
 
 router.get("/findID", async(req, res)=>{
@@ -51,13 +51,4 @@ router.post('/', async(req, res, next)=>{
   }
 });
 
-router.post("/findUser", (req, res)=>{
-  console.log(req.body.resID);
-    const reqID = req.body.resID;
-    db.collection('userTokens')
-        .findOne({ userID: reqID })
-        .then(user => res.json({ found: true }) )
-        .catch(err => res.json({ found: false }) );
-});
-
-module.exports = router;
+module.exports = {User, router};

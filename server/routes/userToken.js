@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const crypto = require('crypto');
-const { response } = require('../app');
+const {User} = require('./users');
 dotenv.config();
 mongoose.connect(process.env.DATABASE);
 const db = mongoose.connection;
@@ -23,7 +23,7 @@ const tokenSchema = new mongoose.Schema({
         type: String,
         require: true
     }
-});
+}, {collection: 'userTokens'});
 const Token = mongoose.model('Token', tokenSchema);
 
 router.get("/", async(req, res)=>{
@@ -46,12 +46,7 @@ router.post("/add", async(req, res)=>{
     const resID = await response1.json().id;
 
     //find user是否有登入過
-    const response2 = await fetch('users/findUser', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({resID})
-    });
-    const found = await response2.json().found;
+    const found = await User.findOne({userID: resID});
     if(!found){
         const response3 = await fetch('users', {
             method: 'POST',
