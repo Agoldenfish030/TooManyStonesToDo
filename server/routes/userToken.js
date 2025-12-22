@@ -89,7 +89,10 @@ router.post("/add", async(req, res)=>{
 router.delete("/", async(req, res)=>{
     const delState = req.body.state;
     await Token.deleteOne({state: delState})
-        .then(response => res.status(200).json({message: "刪除暫存token成功"}))
+        .then(response =>{
+            console.log("刪除token成功！");
+            res.status(200).json({message: "刪除暫存token成功"});
+        })
         .catch(err => res.status(500).json({ message: err.message }));
 });
 
