@@ -59,7 +59,7 @@ router.post("/add", async(req, res)=>{
             const user = new User({
                 userID: resID,
                 haveBoard: false,
-                mainBoardID: null,
+                mainBoardID: "-",
                 cardUpdate: []
             });
             const newUser = await user.save();
