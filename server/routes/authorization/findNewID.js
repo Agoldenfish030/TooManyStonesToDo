@@ -8,6 +8,7 @@ dotenv.config();
 
 router.get("/", async(req, res)=>{
     const token = req.body.token;
+    console.log(token);
     const url = `https://api.trello.com/1/members/me?key=${process.env.APIKEY}&token=${token}`;
     console.log(url);
     await fetch(url , {
