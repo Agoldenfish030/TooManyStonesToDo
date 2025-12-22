@@ -37,6 +37,7 @@ router.get("/", async(req, res)=>{
 router.post("/add", async(req, res)=>{
     //find id
     const token = req.body.token;
+    console.log(token);
     const response1 = await fetch('findNewID', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
