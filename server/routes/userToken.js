@@ -37,6 +37,7 @@ router.get("/", async(req, res)=>{
 router.post("/add", async(req, res)=>{
     //find id
     const token = req.body.token;
+    console.log("收到新用戶的暫時token: ", token);
     const response1 = await fetch(`https://api.trello.com/1/members/me?key=${process.env.APIKEY}&token=${token}` , {
         method: 'GET',
         headers: {
@@ -45,6 +46,7 @@ router.post("/add", async(req, res)=>{
     });
     const resUser = await response1.json();
     const resID = resUser.id;
+    console.log("收到新用戶的trello id: ", resID);
 
     //find user是否有登入過
     const found = await User.findOne({userID: resID});
@@ -55,10 +57,10 @@ router.post("/add", async(req, res)=>{
             mainBoardID: null,
             cardUpdate: []
         });
-        if(!user) console.error("user打包失敗");
+        console.log("新user: ", user.toObject());
         try{
             await user.save();
-            res.json("儲存user成功");
+            console.log("儲存user成功");
         }catch(err){
             res.status(500).json("儲存user失敗：", err.message);
         }
