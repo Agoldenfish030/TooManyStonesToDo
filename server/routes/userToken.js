@@ -13,15 +13,15 @@ db.once('open', function (){ console.log('connected userToken...') });
 const tokenSchema = new mongoose.Schema({
     token: {
         type: String,
-        require: true
+        required: true
     },
     state: {
         type: String,
-        require: true
+        required: true
     },
     userID: {
         type: String,
-        require: true
+        required: true
     }
 }, {collection: 'userTokens'});
 const Token = mongoose.model('Token', tokenSchema);
@@ -43,7 +43,8 @@ router.post("/add", async(req, res)=>{
             'Accept': 'application/json'
         }
     });
-    const resID = await response1.json().id;
+    const resUser = await response1.json();
+    const resID = await resUser.id;
 
     //find user是否有登入過
     const found = await User.findOne({userID: resID});

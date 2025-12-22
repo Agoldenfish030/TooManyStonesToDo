@@ -11,19 +11,19 @@ db.once('open', function (){ console.log('connected users...') });
 const userSchema = new mongoose.Schema({
     userID: {
       type: String,
-      require: true
+      required: true
     },
     haveBoard: {
       type: Boolean,
-      require: true
+      required: true
     },
     mainBoardID: {
       type: String,
-      require: true
+      required: true
     },
     cardUpdate: {
       type: [String],
-      require: false
+      required: false
     }
 }, {collection: 'userDatas'});
 const User = mongoose.model('User', userSchema);
