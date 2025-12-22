@@ -55,7 +55,7 @@ router.post("/add", async(req, res)=>{
             mainBoardID: null,
             cardUpdate: []
         });
-        console.log("data: ", user.toObject());
+        if(!user) console.error("user打包失敗");
         try{
             await user.save();
             res.json("儲存user成功");
