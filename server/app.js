@@ -7,7 +7,7 @@ var logger = require('morgan');
 const cors = require('cors');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const {router: usersRouter} = require('./routes/users');
 const logInLinkRouter = require('./routes/authorization/logInLink');
 const tokenRouter = require('./routes/userToken');
 const getWebhookRouter = require('./routes/getTrello/getWebhook');
