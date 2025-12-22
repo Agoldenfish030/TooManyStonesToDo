@@ -52,6 +52,7 @@ router.post('/', async(req, res, next)=>{
 });
 
 router.post("/findUser", (req, res)=>{
+  console.log(req.body.resID);
     const reqID = req.body.resID;
     db.collection('userTokens')
         .findOne({ userID: reqID })
