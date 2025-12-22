@@ -64,7 +64,8 @@ router.post("/add", async(req, res)=>{
     const userState = crypto.randomBytes(32).toString('hex');
     const userToken = new Token({
         token: req.body.token,
-        state: userState
+        state: userState,
+        userID: resID
     });
 
     try{
