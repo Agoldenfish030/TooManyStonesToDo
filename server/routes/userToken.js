@@ -48,12 +48,17 @@ router.post("/add", async(req, res)=>{
     //find user是否有登入過
     const found = await User.findOne({userID: resID});
     if(!found){
-        const response3 = await fetch('users', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({resID})
+        const user = new User({
+            userID: req.body.resID,
+            haveBoard: false,
+            mainBoardID: null,
+            cardUpdate: []
         });
-        if(!response3.ok) res.status(500).json("回報：儲存user失敗");
+        try{
+            await user.save(User.collection);
+        }catch(err){
+            res.status(500).json("儲存user失敗：", err.message);
+        }
     }
 
     const userState = crypto.randomBytes(32).toString('hex');
