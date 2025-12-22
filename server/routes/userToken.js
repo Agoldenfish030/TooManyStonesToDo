@@ -51,7 +51,7 @@ router.post("/add", async(req, res)=>{
         })
         .then(text => console.log(text))
         .catch(err => console.error(err));
-    const resID = await response1.json().id;
+    const resID = await response1.id;
 
     //find user是否有登入過
     const response2 = await fetch('users/findUser', {
