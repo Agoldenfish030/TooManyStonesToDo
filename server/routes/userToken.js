@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const crypto = require('crypto');
 const {User} = require('./users');
+const { response } = require('../app');
 dotenv.config();
 mongoose.connect(process.env.DATABASE);
 const db = mongoose.connection;
@@ -34,49 +35,54 @@ router.get("/", async(req, res)=>{
 });
 
 router.post("/add", async(req, res)=>{
-    //find id
-    const token = req.body.token;
-    console.log("收到新用戶的暫時token: ", token);
-    const response1 = await fetch(`https://api.trello.com/1/members/me?key=${process.env.APIKEY}&token=${token}` , {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json'
-        }
-    });
-    const resUser = await response1.json();
-    const resID = resUser.id;
-    console.log("收到新用戶的trello id: ", resID);
+    try{
+        //find id
+        const token = req.body.token;
+        console.log("收到新用戶的暫時token: ", token);
+        if (!token) return res.status(400).json({ message: "缺少 Token" });
 
-    //find user是否有登入過
-    const found = await User.findOne({userID: resID});
-    if(!found){
-        const user = new User({
-            userID: resID,
-            haveBoard: false,
-            mainBoardID: null,
-            cardUpdate: []
+        const response1 = await fetch(`https://api.trello.com/1/members/me?key=${process.env.APIKEY}&token=${token}` , {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
         });
-        try{
+        if(!response1.ok) return res.status(response1.status).json({ message: "Trello API 請求失敗" });
+
+        const resUser = await response1.json();
+        const resID = resUser.id;
+        console.log("收到新用戶的trello id: ", resID);
+
+        //find user是否有登入過
+        const found = await User.findOne({userID: resID});
+        if(!found){
+            const user = new User({
+                userID: resID,
+                haveBoard: false,
+                mainBoardID: null,
+                cardUpdate: []
+            });
             const newUser = await user.save();
             console.log("儲存user成功: ", newUser);
-        }catch(err){
-            return res.status(500).json({message: err.message});
         }
-    }
 
-    const userState = crypto.randomBytes(32).toString('hex');
-    const userToken = new Token({
-        token: req.body.token,
-        state: userState,
-        userID: resID
-    });
+        const userState = crypto.randomBytes(32).toString('hex');
+        const userToken = new Token({
+            token: req.body.token,
+            state: userState,
+            userID: resID
+        });
 
-    try{
+
         const newToken = await userToken.save();
         console.log("儲存token成功: ", newToken);
         res.status(200).json({'userState': userState});
     }catch(err){
-        res.status(500).json({message: err.message} );
+        console.error("發生錯誤: ", err);
+        res.status(500).json({
+            message: "伺服器錯誤",
+            error: err.message
+        });
     }
 });
 
