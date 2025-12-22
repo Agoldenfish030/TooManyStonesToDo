@@ -49,7 +49,7 @@ router.post("/add", async(req, res)=>{
     const found = await User.findOne({userID: resID});
     if(!found){
         const user = new User({
-            userID: req.body.resID,
+            userID: resID,
             haveBoard: false,
             mainBoardID: null,
             cardUpdate: []
