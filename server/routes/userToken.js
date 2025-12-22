@@ -42,16 +42,8 @@ router.post("/add", async(req, res)=>{
         headers: {
             'Accept': 'application/json'
         }
-    })
-        .then(response => {
-            console.log(
-                `Response: ${response.status} ${response.statusText}`
-            );
-            return response.text();
-        })
-        .then(text => console.log(text))
-        .catch(err => console.error(err));
-    const resID = await response1.id;
+    });
+    const resID = await response1.json().id;
 
     //find user是否有登入過
     const response2 = await fetch('users/findUser', {
