@@ -28,8 +28,7 @@ const Token = mongoose.model('Token', tokenSchema);
 
 router.get("/", async(req, res)=>{
     const reqState = req.body.state;
-    db.collection('userTokens')
-        .findOne({state: reqState})
+    await Token.findOne({state: reqState})
         .then(response => res.status(200).json(response))
         .catch(err => res.status(400).json({ message: err.message }));
 });
@@ -61,7 +60,7 @@ router.post("/add", async(req, res)=>{
             const newUser = await user.save();
             console.log("儲存user成功: ", newUser);
         }catch(err){
-            res.status(500).json("儲存user失敗：", err.message);
+            return res.status(500).json({message: err.message});
         }
     }
 
@@ -77,16 +76,15 @@ router.post("/add", async(req, res)=>{
         console.log("儲存token成功: ", newToken);
         res.status(200).json({'userState': userState});
     }catch(err){
-        res.status(500).json("暫存token失敗：", err.message );
+        res.status(500).json({message: err.message} );
     }
 });
 
 router.delete("/", async(req, res)=>{
     const delState = req.body.state;
-    db.collection('userTokens')
-        .deleteOne({state: delState})
-        .then(response => res.status(200).json("刪除暫存token成功"))
+    await Token.deleteOne({state: delState})
+        .then(response => res.status(200).json({message: "刪除暫存token成功"}))
         .catch(err => res.status(500).json({ message: err.message }));
 });
 
-module.exports = router;
+module.exports = {Token, router};

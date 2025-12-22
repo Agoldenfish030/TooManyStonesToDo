@@ -9,7 +9,7 @@ const cors = require('cors');
 var indexRouter = require('./routes/index');
 const {router: usersRouter} = require('./routes/users');
 const logInLinkRouter = require('./routes/authorization/logInLink');
-const tokenRouter = require('./routes/userToken');
+const {router: tokenRouter} = require('./routes/userToken');
 const getWebhookRouter = require('./routes/getTrello/getWebhook');
 const listenWebhookRouter = require('./routes/getTrello/listenWebhook');
 
