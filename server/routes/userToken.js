@@ -37,7 +37,7 @@ router.get("/", async(req, res)=>{
 router.post("/add", async(req, res)=>{
     //find id
     const token = req.body.token;
-    await fetch(`https://api.trello.com/1/members/me?key=${process.env.APIKEY}&token=${token}` , {
+    const response1 = await fetch(`https://api.trello.com/1/members/me?key=${process.env.APIKEY}&token=${token}` , {
         method: 'GET',
         headers: {
             'Accept': 'application/json'
@@ -54,19 +54,19 @@ router.post("/add", async(req, res)=>{
     const resID = await response1.json().id;
 
     //find user是否有登入過
-    const response1 = await fetch('users/findUser', {
+    const response2 = await fetch('users/findUser', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({resID})
     });
-    const found = await response1.json().found;
+    const found = await response2.json().found;
     if(!found){
-        const response2 = await fetch('users', {
+        const response3 = await fetch('users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({resID})
         });
-        if(!response2.ok) res.status(500).json("回報：儲存user失敗");
+        if(!response3.ok) res.status(500).json("回報：儲存user失敗");
     }
 
     const userState = crypto.randomBytes(32).toString('hex');
