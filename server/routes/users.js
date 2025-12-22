@@ -36,14 +36,6 @@ router.get("/findID", async(req, res)=>{
     .catch(err => res.status(400).json({message: err.message}));
 });
 
-router.get("/findUser", (req, res)=>{
-    const reqID = req.body.resID;
-    db.collection('userTokens')
-        .findOne({ userID: reqID })
-        .then(user => res.json({ found: true }) )
-        .catch(err => res.json({ found: false }) );
-});
-
 /* GET users listing. */
 router.post('/', async(req, res, next)=>{
   const user = new User({
@@ -57,6 +49,14 @@ router.post('/', async(req, res, next)=>{
   }catch(err){
     res.status(500).json("儲存user失敗：", err.message);
   }
+});
+
+router.post("/findUser", (req, res)=>{
+    const reqID = req.body.resID;
+    db.collection('userTokens')
+        .findOne({ userID: reqID })
+        .then(user => res.json({ found: true }) )
+        .catch(err => res.json({ found: false }) );
 });
 
 module.exports = router;

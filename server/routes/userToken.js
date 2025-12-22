@@ -37,9 +37,7 @@ router.get("/", async(req, res)=>{
 router.post("/add", async(req, res)=>{
     //find id
     const token = req.body.token;
-    const url = `https://api.trello.com/1/members/me?key=${process.env.APIKEY}&token=${token}`;
-    console.log(url);
-    await fetch(url , {
+    await fetch(`https://api.trello.com/1/members/me?key=${process.env.APIKEY}&token=${token}` , {
         method: 'GET',
         headers: {
             'Accept': 'application/json'
@@ -57,7 +55,7 @@ router.post("/add", async(req, res)=>{
 
     //find user是否有登入過
     const response1 = await fetch('users/findUser', {
-        method: 'GET',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({resID})
     });
