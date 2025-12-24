@@ -27,13 +27,6 @@ const tokenSchema = new mongoose.Schema({
 }, {collection: 'userTokens'});
 const Token = mongoose.model('Token', tokenSchema);
 
-router.get("/", async(req, res)=>{
-    const reqState = req.body.state;
-    await Token.findOne({state: reqState})
-        .then(response => res.status(200).json(response))
-        .catch(err => res.status(400).json({ message: err.message }));
-});
-
 router.post("/add", async(req, res)=>{
     try{
         //find id
