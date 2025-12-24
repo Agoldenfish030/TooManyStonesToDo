@@ -24,8 +24,8 @@ router.post("/", async(req, res)=>{
 
             const boardID = model.id;
             //action in need:
-            //add:
-            //delete:
+            //add:createCard, copyCard, moveCardFromBoard, emailCard, convertToCardFromCheckItem, *updateCard
+            //delete:deleteCard, moveCardToBoard, *updateCard
         }else{
             res.status(400).json({message: "listenWebhook回報：收到不正確的post require"});
         }

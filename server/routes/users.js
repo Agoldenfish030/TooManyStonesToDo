@@ -19,13 +19,13 @@ const userSchema = new mongoose.Schema({
       type: String,
       required: true
     },
-    allBoardID: {
+    allBoardsID: {
       type: [String],
       required: true
     },
-    cardUpdate: {
+    allCardsID: {
       type: [String],
-      required: false
+      required: true
     }
 }, {collection: 'userDatas'});
 const User = mongoose.model('User', userSchema);

@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const crypto = require('crypto');
 const {User} = require('./users');
-const { response } = require('../app');
 dotenv.config();
 mongoose.connect(process.env.DATABASE);
 const db = mongoose.connection;
@@ -54,8 +53,8 @@ router.post("/add", async(req, res)=>{
                 userID: resID,
                 haveBoard: false,
                 mainBoardID: "-",
-                allBoardID: boardList,
-                cardUpdate: []
+                allBoardsID: boardList,
+                allCardsID: []
             });
             const newUser = await user.save();
             console.log("儲存user成功: ", newUser);
