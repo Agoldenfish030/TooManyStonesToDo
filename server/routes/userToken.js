@@ -56,10 +56,12 @@ router.post("/add", async(req, res)=>{
         //find user是否有登入過
         const found = await User.findOne({userID: resID});
         if(!found){
+            const boardList = resUser.idBoards;
             const user = new User({
                 userID: resID,
                 haveBoard: false,
                 mainBoardID: "-",
+                allBoardID: boardList,
                 cardUpdate: []
             });
             const newUser = await user.save();

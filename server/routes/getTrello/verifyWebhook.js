@@ -7,4 +7,6 @@ const verifyWebhook = (request, callbackURL)=>{
                             .digest("base64");
     const headerHash = request.headers["x-trello-webhook"];
     return headerHash == doubleHash;
-}
+};
+
+module.exports = verifyWebhook;

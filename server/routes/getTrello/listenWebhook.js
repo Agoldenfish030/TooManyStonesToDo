@@ -13,13 +13,19 @@ router.post("/", async(req, res)=>{
             const action = req.body.action.json();
             const model = req.body.model.json();
             const webhook = req.body.webhook.json();
+            ///* for check content of the data
             console.log(
                 "正確收到webhook request！\n" +
                 `action: ${action}\n` +
                 `model: ${model}\n` +
                 `webhook: ${webhook}`
             );
+            //*/
 
+            const boardID = model.id;
+            //action in need:
+            //add:
+            //delete:
         }else{
             res.status(400).json({message: "listenWebhook回報：收到不正確的post require"});
         }
