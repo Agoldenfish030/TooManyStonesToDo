@@ -1,21 +1,17 @@
 const fetch = require('node-fetch');
 const dotenv = require('dotenv');
+const {User} = require('../users');
+const {Token} = require('../userToken');
 dotenv.config();
 
 const getWebhook = async({ userState })=>{
-    const userToken = await fetch('userToken',{
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({userState})
-    });
-    const token = await userToken.json().token;
-    const id = await userToken.json().userID;
-    const userData = await fetch('users/findID', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({id})
-    });
-    const boardID = await userData.json().mainBoardID;
+    const userToken = await Token.findOne({state: userState}).lean();
+    const token = userToken.token;
+    const id = userToken.userID;
+
+    const userData = await User.findOne({userID: id});
+    const user = await userData.json();
+    const boardID = user.mainBoardID;
     const callbackURL = "https://toomuchstonestodo.onrender.com/listenWebhook";
 
     fetch(`https://api.trello.com/1/tokens/${token}/webhooks/?key=${process.env.APIKEY}`, {
@@ -24,7 +20,7 @@ const getWebhook = async({ userState })=>{
             'Accept': 'application/json'
         },
         body: JSON.stringify({
-            description: "TooManyStonesToDo",
+            description: "TooMuchStonesToDo",
             callbackURL: callbackURL,
             idModel: boardID
         })

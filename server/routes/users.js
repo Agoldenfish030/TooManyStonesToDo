@@ -28,14 +28,6 @@ const userSchema = new mongoose.Schema({
 }, {collection: 'userDatas'});
 const User = mongoose.model('User', userSchema);
 
-router.get("/findID", async(req, res)=>{
-  const userID = req.body.id;
-  db.collection('userDatas')
-    .findOne({userID: userID})
-    .then(response => res.status(200).json(response))
-    .catch(err => res.status(400).json({message: err.message}));
-});
-
 /* GET users listing. */
 router.post('/', async(req, res, next)=>{
   const user = new User({
