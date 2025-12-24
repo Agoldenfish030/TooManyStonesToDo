@@ -26,7 +26,18 @@ const tokenSchema = new mongoose.Schema({
 }, {collection: 'userTokens'});
 const Token = mongoose.model('Token', tokenSchema);
 
-router.post("/add", async(req, res)=>{
+router.get("/getBoardsID", async(req, res)=>{
+    try{
+        const state = req.body.userState;
+        const id = Token.findOne({state: state}).userID; //**
+        const boardList = User.findOne({userID: id}).allBoardsID; //**
+        res.status(200).json(boardList);
+    }catch(err){
+        res.status(500).json({message: "getBoards失敗：" + err.message});
+    }
+});
+
+router.post("/", async(req, res)=>{
     try{
         //find id
         const token = req.body.token;
