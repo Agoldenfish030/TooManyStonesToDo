@@ -36,7 +36,7 @@ router.get("/getBoards", async(req, res)=>{
         const user = User.findOne({userID: id});
         const boardIDList = user.allBoardsID;
         const mainBoardID = user.mainBoardID;
-        
+
         const boardList = [];
         for(boardID in boardIDList){
             const boardData = (await fetch(`https://api.trello.com/1/boards/${boardID}?key=${process.env.APIKEY}&token=${token}`)).json();
@@ -105,7 +105,7 @@ router.post("/", async(req, res)=>{
 
         const newToken = await userToken.save();
         console.log("儲存token成功: ", newToken);
-        res.status(200).json({'userState': userState});
+        res.status(201).json({'userState': userState});
     }catch(err){
         console.error("發生錯誤: ", err);
         res.status(500).json({
@@ -121,6 +121,8 @@ router.put("/changeMainBoard", async(req, res)=>{
 
     const id = (await Token.findOne({state: state})).json().userID;
     await User.findOneAndUpdate({userID: id}, {mainBoardID: newMainBoardID}, {new: true});
+    const newCardsList = (await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/?cards=incomplete`)).json();
+    res.status(200).json(newCardsList);
 });
 
 module.exports = {Token, router};
