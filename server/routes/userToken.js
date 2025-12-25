@@ -82,7 +82,8 @@ router.post("/", async(req, res)=>{
             const newUser = await user.save();
             console.log("儲存user成功: ", newUser);
         }else{
-            await Token.deleteOne({userID: resID})
+            await Token.deleteOne({userID: resID});
+            console.log("更新用戶之token，用戶id：", resID);
         }
 
         const userState = crypto.randomBytes(32).toString('hex');
@@ -91,7 +92,6 @@ router.post("/", async(req, res)=>{
             state: userState,
             userID: resID
         });
-
 
         const newToken = await userToken.save();
         console.log("儲存token成功: ", newToken);
