@@ -81,6 +81,8 @@ router.post("/", async(req, res)=>{
             });
             const newUser = await user.save();
             console.log("儲存user成功: ", newUser);
+        }else{
+            await Token.deleteOne({userID: resID})
         }
 
         const userState = crypto.randomBytes(32).toString('hex');
@@ -101,17 +103,6 @@ router.post("/", async(req, res)=>{
             error: err.message
         });
     }
-});
-
-router.delete("/", async(req, res)=>{
-    const delState = req.body.state;
-    console.log("將要刪除state: ", delState);
-    await Token.deleteOne({state: delState})
-        .then(response =>{
-            console.log("刪除token成功！");
-            res.status(200).json({message: "刪除暫存token成功"});
-        })
-        .catch(err => res.status(500).json({ message: err.message }));
 });
 
 module.exports = {Token, router};
