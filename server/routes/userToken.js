@@ -33,7 +33,10 @@ router.get("/getBoards", async(req, res)=>{
         const id = userToken.userID;
         const token = userToken.token;
 
-        const boardIDList = User.findOne({userID: id}).allBoardsID; //**
+        const user = User.findOne({userID: id});
+        const boardIDList = user.allBoardsID;
+        const mainBoardID = user.mainBoardID;
+        
         const boardList = [];
         for(boardID in boardIDList){
             const boardData = (await fetch(`https://api.trello.com/1/boards/${boardID}?key=${process.env.APIKEY}&token=${token}`)).json();
@@ -43,7 +46,14 @@ router.get("/getBoards", async(req, res)=>{
             }
             boardList.push(board);
         }
-        res.status(200).json(boardList);
+        const mainBoardName = (await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`)).json().name;
+        res.status(200).json({
+            mainBoard: {
+                id: mainBoardID,
+                name: mainBoardName
+            },
+            boardList: boardList
+        });
     }catch(err){
         res.status(500).json({message: "getBoards失敗：" + err.message});
     }
@@ -83,7 +93,7 @@ router.post("/", async(req, res)=>{
             console.log("儲存user成功: ", newUser);
         }else{
             await Token.deleteOne({userID: resID});
-            console.log("更新用戶之token，用戶id：", resID);
+            console.log("準備更新用戶之token，用戶id：", resID);
         }
 
         const userState = crypto.randomBytes(32).toString('hex');
@@ -103,6 +113,14 @@ router.post("/", async(req, res)=>{
             error: err.message
         });
     }
+});
+
+router.put("/changeMainBoard", async(req, res)=>{
+    const state = req.body.userState;
+    const newMainBoardID = req.body.boardID;
+
+    const id = (await Token.findOne({state: state})).json().userID;
+    await User.findOneAndUpdate({userID: id}, {mainBoardID: newMainBoardID}, {new: true});
 });
 
 module.exports = {Token, router};
