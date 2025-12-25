@@ -26,11 +26,23 @@ const tokenSchema = new mongoose.Schema({
 }, {collection: 'userTokens'});
 const Token = mongoose.model('Token', tokenSchema);
 
-router.get("/getBoardsID", async(req, res)=>{
+router.get("/getBoards", async(req, res)=>{
     try{
         const state = req.body.userState;
-        const id = Token.findOne({state: state}).userID; //**
-        const boardList = User.findOne({userID: id}).allBoardsID; //**
+        const userToken = Token.findOne({state: state});
+        const id = userToken.userID;
+        const token = userToken.token;
+
+        const boardIDList = User.findOne({userID: id}).allBoardsID; //**
+        const boardList = [];
+        for(boardID in boardIDList){
+            const boardData = (await fetch(`https://api.trello.com/1/boards/${boardID}?key=${process.env.APIKEY}&token=${token}`)).json();
+            const board = {
+                id: id,
+                name: boardData.name
+            }
+            boardList.push(board);
+        }
         res.status(200).json(boardList);
     }catch(err){
         res.status(500).json({message: "getBoards失敗：" + err.message});
