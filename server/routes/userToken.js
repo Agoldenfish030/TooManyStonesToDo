@@ -40,8 +40,8 @@ router.get("/getBoards", async(req, res)=>{
         const boardIDList = user.allBoardsID;
         const mainBoardID = user.mainBoardID;
         const allCards = user.allCards;
-        const response4 = (await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`)).json();
-        if(response4.status == 404){
+        const Response4 = await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`);
+        if(Response4.status == 404){
             console.error("用戶" + id + "刪除了mainBoard！");
             user.mainBoardID = "-";
             user.allCards = [];
@@ -51,7 +51,9 @@ router.get("/getBoards", async(req, res)=>{
 
         const boardList = [];
         for(let boardID in boardIDList){
-            const boardData = (await fetch(`https://api.trello.com/1/boards/${boardID}?key=${process.env.APIKEY}&token=${token}`)).json();
+            const BoardData = await fetch(`https://api.trello.com/1/boards/${boardID}?key=${process.env.APIKEY}&token=${token}`);
+            if(!BoardData.ok) return res.status(BoardData.status).json(BoardData.text);
+            const boardData = await BoardData.json();
             const board = {
                 id: id,
                 name: boardData.name
@@ -59,7 +61,9 @@ router.get("/getBoards", async(req, res)=>{
             boardList.push(board);
         }
 
-        const mainBoardName = (await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`)).json().name;
+        const MainBoard = await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`);
+        if(!MainBoard.ok) return res.status(MainBoard.status).json(MainBoard.text);
+        const mainBoardName = await MainBoard.json().name;
         const boardDatas = {
                 mainBoard: {
                     id: mainBoardID,
@@ -149,7 +153,9 @@ router.put("/changeMainBoard", async(req, res)=>{
         console.log("用戶" + id + "為初次進入，請忽略404");
     }
     const oldWebhookID = user.boardWebhook.id;
-    const newCardsList = (await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/?cards=incomplete`)).json();
+    const NewCardsList = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/?cards=incomplete`);
+    if(!NewCardsList.ok) return res.status(NewCardsList.status).json(NewCardsList.text);
+    const newCardsList = await NewCardsList.json();
 
     console.log("用戶" + id + "即將更新webhook...");
     //delWebhook
