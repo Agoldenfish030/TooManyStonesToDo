@@ -40,22 +40,14 @@ router.get("/getBoards", async(req, res)=>{
         const boardIDList = user.allBoardsID;
         const mainBoardID = user.mainBoardID;
         const allCards = user.allCards;
-        if(mainBoardID != "-"){
-            const Response4 = await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`);
-            if(!Response4.ok) console.error("mainBoard獲取失敗");
-            if(Response4.status == 404){
-                console.error("用戶" + id + "刪除了mainBoard！");
-                user.mainBoardID = "-";
-                user.allCards = [];
-                user.boardWebhook = null;
-                await user.save();
-            }
-        }
 
         const boardList = [];
         for(let boardID in boardIDList){
             const BoardData = await fetch(`https://api.trello.com/1/boards/${boardID}?key=${process.env.APIKEY}&token=${token}`);
-            if(!BoardData.ok) return res.status(BoardData.status).json(BoardData.text);
+            if(!BoardData.ok){
+                console.error("BoardData獲取失敗");
+                return res.status(BoardData.status).json(BoardData.text);
+            }
             const boardData = await BoardData.json();
             const board = {
                 id: id,
@@ -65,8 +57,22 @@ router.get("/getBoards", async(req, res)=>{
         }
 
         const MainBoard = await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`);
-        if(!MainBoard.ok) return res.status(MainBoard.status).json(MainBoard.text);
-        const mainBoardName = await MainBoard.json().name;
+        const mainBoardName = "";
+        if(mainBoardID != "-"){
+            if(!MainBoard.ok){
+                console.error("mainBoard獲取失敗");
+                if(MainBoard.status == 404){
+                    console.error("用戶" + id + "刪除了mainBoard！");
+                    user.mainBoardID = "-";
+                    user.allCards = [];
+                    user.boardWebhook = null;
+                    await user.save();
+                }else{
+                    return res.status(MainBoard.status).json(MainBoard.text);
+                }
+            }else mainBoardName = await MainBoard.json().name;
+        }else mainBoardName = await MainBoard.json().name;
+
         const boardDatas = {
                 mainBoard: {
                     id: mainBoardID,
