@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const crypto = require('crypto');
 const {User} = require('./users');
-const getWebhook = require('./getTrello/getWebhook');
 dotenv.config();
 mongoose.connect(process.env.DATABASE);
 const db = mongoose.connection;
@@ -132,17 +131,17 @@ router.put("/changeMainBoard", async(req, res)=>{
     const id = userToken.userID;
 
     const user = (await User.findOne({userID: id})).json();
-    const oldMainBoardID = user.mainBoardID;
+    const oldWebhookID = user.boardWebhook.id;
     const newCardsList = (await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/?cards=incomplete`)).json();
 
-    console.log("即將更新webhook...");
+    console.log("用戶" + id + "即將更新webhook...");
     //delWebhook
     if(oldMainBoardID != "-"){
-        const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldMainBoardID}?key=${process.env.APIKEY}&token=${token}`, {
+        const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${token}`, {
             method: 'DELETE'
         });
-        if(response2.ok) console.log("舊webhook刪除成功！");
-        else return res.status(response2.status).json({message: response2.statusText});
+        if(!response2.ok) return res.status(response2.status).json(response2.statusText);
+        console.log("用戶" + id + "之舊webhook刪除成功！");
     }
 
     //getWebhook
@@ -158,6 +157,8 @@ router.put("/changeMainBoard", async(req, res)=>{
                 idModel: newMainBoardID
             })
         });
+    if(!response3.ok) return res.status(response3.status).json(response3.statusText);
+    console.log("成功取得" + id + "之webhook！");
     const newWebhook = await response3.json();
     
     await User.findOneAndUpdate(
