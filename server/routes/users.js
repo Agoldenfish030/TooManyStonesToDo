@@ -11,10 +11,6 @@ const userSchema = new mongoose.Schema({
       type: String,
       required: true
     },
-    haveBoard: {
-      type: Boolean,
-      required: true
-    },
     mainBoardID: {
       type: String,
       required: true
