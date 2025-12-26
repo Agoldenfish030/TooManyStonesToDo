@@ -46,7 +46,7 @@ router.get("/getBoards", async(req, res)=>{
             const BoardData = await fetch(`https://api.trello.com/1/boards/${boardIDList[boardIndex]}?key=${process.env.APIKEY}&token=${token}`);
             if(!BoardData.ok){
                 console.error("BoardData獲取失敗");
-                return res.status(BoardData.status).json(BoardData.text);
+                return res.status(BoardData.status).json(BoardData.statusText);
             }
             const boardData = await BoardData.json();
             const board = {
@@ -68,7 +68,7 @@ router.get("/getBoards", async(req, res)=>{
                     user.boardWebhook = null;
                     await user.save();
                 }else{
-                    return res.status(MainBoard.status).json(MainBoard.text);
+                    return res.status(MainBoard.status).json(MainBoard.statusText);
                 }
             }else mainBoardName = await MainBoard.json().name;
         }
@@ -157,7 +157,7 @@ router.put("/changeMainBoard", async(req, res)=>{
     let newCardsList = [];
     if(!NewCardsList.ok){
         console.error("未成功獲取NewCardsList");
-        if(NewCardsList.status != 404) return res.status(NewCardsList.status).json(NewCardsList.text);
+        if(NewCardsList.status != 404) return res.status(NewCardsList.status).json(NewCardsList.statusText);
     }else newCardsList = await NewCardsList.json();
 
     const userToken = await Token.findOne({state: state});
