@@ -10,7 +10,6 @@ var indexRouter = require('./routes/index');
 const {router: usersRouter} = require('./routes/users');
 const logInLinkRouter = require('./routes/authorization/logInLink');
 const {router: tokenRouter} = require('./routes/userToken');
-const getWebhookRouter = require('./routes/getTrello/getWebhook');
 const listenWebhookRouter = require('./routes/getTrello/listenWebhook');
 
 var app = express();
@@ -38,7 +37,6 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/logInLink', logInLinkRouter);
 app.use('/userToken', tokenRouter);
-app.use('/getWebhook', getWebhookRouter);
 app.use('/listenWebhook', listenWebhookRouter);
 
 // catch 404 and forward to error handler
