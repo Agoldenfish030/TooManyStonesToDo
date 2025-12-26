@@ -153,13 +153,11 @@ router.put("/changeMainBoard", async(req, res)=>{
     const state = req.body.userState;
     const newMainBoardID = req.body.mainBoardID;
 
-    const UserToken = await Token.findOne({state: state});
-    const userToken = await UserToken.json();
+    const userToken = await Token.findOne({state: state});
     const token = userToken.token;
     const id = userToken.userID;
 
-    const User = await User.findOne({userID: id});
-    const user = await User.json();
+    const user = await User.findOne({userID: id});
     if(!user.boardWebhook){
         console.log("用戶" + id + "為初次進入，請忽略404");
     }
