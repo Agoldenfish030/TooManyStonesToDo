@@ -126,6 +126,9 @@ router.post("/", async(req, res)=>{
 });
 
 router.put("/changeMainBoard", async(req, res)=>{
+    ///*
+    console.log("呼叫changeMainBoard成功！");
+    //*/
     const state = req.body.userState;
     const newMainBoardID = req.body.mainBoardID;
 
@@ -134,6 +137,9 @@ router.put("/changeMainBoard", async(req, res)=>{
     const id = userToken.userID;
 
     const user = (await User.findOne({userID: id})).json();
+    if(!user.boardWebhook){
+        console.log("用戶" + id + "為初次進入，請忽略404");
+    }
     const oldWebhookID = user.boardWebhook.id;
     const newCardsList = (await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/?cards=incomplete`)).json();
 
@@ -143,7 +149,10 @@ router.put("/changeMainBoard", async(req, res)=>{
         const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${token}`, {
             method: 'DELETE'
         });
-        if(!response2.ok) return res.status(response2.status).json(response2.statusText);
+        if(!response2.ok){
+            console.error("刪除webhook失敗！");
+            return res.status(response2.status).json(response2.statusText);
+        }
         console.log("用戶" + id + "之舊webhook刪除成功！");
     }
 
@@ -160,7 +169,10 @@ router.put("/changeMainBoard", async(req, res)=>{
                 idModel: newMainBoardID
             })
         });
-    if(!response3.ok) return res.status(response3.status).json(response3.statusText);
+    if(!response3.ok){
+        console.error("獲得webhook失敗！");
+        return res.status(response3.status).json(response3.statusText);
+    }
     console.log("成功取得" + id + "之webhook！");
     const newWebhook = await response3.json();
     
