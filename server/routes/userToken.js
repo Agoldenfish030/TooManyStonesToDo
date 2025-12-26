@@ -27,6 +27,9 @@ const tokenSchema = new mongoose.Schema({
 const Token = mongoose.model('Token', tokenSchema);
 
 router.get("/getBoards", async(req, res)=>{
+    ///*
+    console.log("呼叫getBoards成功！");
+    //*/
     try{
         const state = req.query.userState;
         const userToken = Token.findOne({state: state});
