@@ -75,11 +75,11 @@ router.get("/getBoards", async(req, res)=>{
 
         const boardDatas = {
                 mainBoard: {
-                    id: mainBoardID,
+                    id: user.mainBoardID,
                     name: mainBoardName
                 },
                 boardList: boardList,
-                allCards: allCards
+                allCards: user.allCards
             };
         ///*
         console.log("即將寄出board物件：", boardDatas);
