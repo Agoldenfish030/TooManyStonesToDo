@@ -50,7 +50,7 @@ router.get("/getBoards", async(req, res)=>{
             }
             const boardData = await BoardData.json();
             const board = {
-                id: id,
+                id: boardData.id,
                 name: boardData.name
             }
             boardList.push(board);
