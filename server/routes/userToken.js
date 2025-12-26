@@ -186,16 +186,11 @@ router.put("/changeMainBoard", async(req, res)=>{
 
     //getWebhook
     const callbackURL = "https://toomuchstonestodo.onrender.com/listenWebhook";
-    const response3 = await fetch(`https://api.trello.com/1/tokens/${token}/webhooks/?key=${process.env.APIKEY}`, {
+    const response3 = await fetch(`https://api.trello.com/1/webhooks/?callbackURL=${callbackURL}&idModel=${newMainBoardID}&key=${process.env.APIKEY}&token=${token}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                description: "TooMuchStonesToDo",
-                callbackURL: callbackURL,
-                idModel: newMainBoardID
-            })
         });
     if(!response3.ok){
         console.error("獲得webhook失敗！");
