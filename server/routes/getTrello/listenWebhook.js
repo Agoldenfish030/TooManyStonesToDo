@@ -24,6 +24,7 @@ router.post("/", async(req, res)=>{
 
             const boardID = model.id;
             //action in need:
+            //board disappeared:
             //add:createCard, copyCard, moveCardFromBoard, emailCard, convertToCardFromCheckItem, *updateCard
             //delete:deleteCard, moveCardToBoard, *updateCard
         }else{
