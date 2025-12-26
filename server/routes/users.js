@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
     allCards: {
       type: [Object],
       required: true
+    },
+    boardWebhook: {
+      type: Object,
+      require: false
     }
 }, {collection: 'userDatas'});
 const User = mongoose.model('User', userSchema);

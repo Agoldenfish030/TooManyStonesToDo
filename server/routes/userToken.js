@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const crypto = require('crypto');
 const {User} = require('./users');
+const getWebhook = require('./getTrello/getWebhook');
 dotenv.config();
 mongoose.connect(process.env.DATABASE);
 const db = mongoose.connection;
@@ -126,13 +127,52 @@ router.put("/changeMainBoard", async(req, res)=>{
     const state = req.body.userState;
     const newMainBoardID = req.body.mainBoardID;
 
-    const user = (await Token.findOne({state: state})).json();
-    const id = user.userID;
+    const userToken = (await Token.findOne({state: state})).json();
+    const token = userToken.token;
+    const id = userToken.userID;
+
+    const user = (await User.findOne({userID: id})).json();
+    const oldMainBoardID = user.mainBoardID;
     const newCardsList = (await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/?cards=incomplete`)).json();
-    await User.findOneAndUpdate({userID: id}, {mainBoardID: newMainBoardID});
-    await User.findOneAndUpdate({userID: id}, {allCards: newCardsList});
+
+    console.log("即將更新webhook...");
+    //delWebhook
+    if(oldMainBoardID != "-"){
+        const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldMainBoardID}?key=${process.env.APIKEY}&token=${token}`, {
+            method: 'DELETE'
+        });
+        if(response2.ok) console.log("舊webhook刪除成功！");
+        else return res.status(response2.status).json({message: response2.statusText});
+    }
+
+    //getWebhook
+    const callbackURL = "https://toomuchstonestodo.onrender.com/listenWebhook";
+    const response3 = await fetch(`https://api.trello.com/1/tokens/${token}/webhooks/?key=${process.env.APIKEY}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                description: "TooMuchStonesToDo",
+                callbackURL: callbackURL,
+                idModel: newMainBoardID
+            })
+        });
+    const newWebhook = await response3.json();
+    
+    await User.findOneAndUpdate(
+        {userID: id},
+        {
+            $set: {
+                mainBoardID: newMainBoardID,
+                allCards: newCardsList,
+                boardWebhook: newWebhook
+            }
+        },
+        {new: true}
+    );
     ///*
-    console.log("更新使用者資訊user並回傳卡牌：", user);
+    console.log("回傳卡牌並更新使用者資訊user：", user);
     //*/
     res.status(200).json(newCardsList);
 });
