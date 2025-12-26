@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     },
     boardWebhook: {
       type: Object,
-      require: false
+      required: false
     }
 }, {collection: 'userDatas'});
 const User = mongoose.model('User', userSchema);
