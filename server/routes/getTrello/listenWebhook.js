@@ -3,7 +3,7 @@ const router = express.Router();
 const verifyWebhook = require('./verifyWebhook');
 
 router.head("/", async(req, res)=>{
-    res.status(200);
+    res.status(200).send();
 });
 
 router.post("/", async(req, res)=>{
