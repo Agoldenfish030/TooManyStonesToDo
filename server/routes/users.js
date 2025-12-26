@@ -23,8 +23,8 @@ const userSchema = new mongoose.Schema({
       type: [String],
       required: true
     },
-    allCardsID: {
-      type: [String],
+    allCards: {
+      type: [Object],
       required: true
     }
 }, {collection: 'userDatas'});
