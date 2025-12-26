@@ -32,11 +32,11 @@ router.get("/getBoards", async(req, res)=>{
     //*/
     try{
         const state = req.query.userState;
-        const userToken = Token.findOne({state: state});
+        const userToken = await Token.findOne({state: state});
         const id = userToken.userID;
         const token = userToken.token;
 
-        const user = User.findOne({userID: id});
+        const user = await User.findOne({userID: id});
         const boardIDList = user.allBoardsID;
         const mainBoardID = user.mainBoardID;
         const allCards = user.allCards;
