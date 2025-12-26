@@ -153,6 +153,13 @@ router.put("/changeMainBoard", async(req, res)=>{
     const state = req.body.userState;
     const newMainBoardID = req.body.mainBoardID;
 
+    const NewCardsList = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/?cards=incomplete`);
+    const newCardsList = [];
+    if(!NewCardsList.ok){
+        console.error("未成功獲取NewCardsList");
+        if(NewCardsList.status != 404) return res.status(NewCardsList.status).json(NewCardsList.text);
+    }else newCardsList = await NewCardsList.json();
+
     const userToken = await Token.findOne({state: state});
     const token = userToken.token;
     const id = userToken.userID;
@@ -162,13 +169,6 @@ router.put("/changeMainBoard", async(req, res)=>{
     if(!user.boardWebhook){
         console.log("用戶" + id + "為初次進入，請忽略404");
     }else oldWebhookID = user.boardWebhook.id;
-
-    const NewCardsList = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/?cards=incomplete`);
-    if(!NewCardsList.ok){
-        console.error("未成功獲取NewCardsList");
-        return res.status(NewCardsList.status).json(NewCardsList.text);
-    }
-    const newCardsList = await NewCardsList.json();
 
     console.log("用戶" + id + "即將更新webhook...");
     //delWebhook
