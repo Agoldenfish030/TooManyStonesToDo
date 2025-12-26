@@ -41,6 +41,7 @@ router.get("/getBoards", async(req, res)=>{
         const mainBoardID = user.mainBoardID;
         const allCards = user.allCards;
         const Response4 = await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`);
+        if(!Response4.ok) return res.status(Response4.status).json(Response4.text);
         if(Response4.status == 404){
             console.error("用戶" + id + "刪除了mainBoard！");
             user.mainBoardID = "-";
