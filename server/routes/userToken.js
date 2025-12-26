@@ -40,6 +40,14 @@ router.get("/getBoards", async(req, res)=>{
         const boardIDList = user.allBoardsID;
         const mainBoardID = user.mainBoardID;
         const allCards = user.allCards;
+        const response4 = (await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`)).json();
+        if(response4.status == 404){
+            console.error("用戶" + id + "刪除了mainBoard！");
+            user.mainBoardID = "-";
+            user.allCards = [];
+            user.boardWebhook = null;
+            await user.save();
+        }
 
         const boardList = [];
         for(let boardID in boardIDList){
@@ -176,17 +184,10 @@ router.put("/changeMainBoard", async(req, res)=>{
     console.log("成功取得" + id + "之webhook！");
     const newWebhook = await response3.json();
     
-    await User.findOneAndUpdate(
-        {userID: id},
-        {
-            $set: {
-                mainBoardID: newMainBoardID,
-                allCards: newCardsList,
-                boardWebhook: newWebhook
-            }
-        },
-        {new: true}
-    );
+    user.mainBoardID = newMainBoardID;
+    user.allCards = newCardsList;
+    user.boardWebhook = newWebhook;
+    await user.save();
     ///*
     console.log("回傳卡牌並更新使用者資訊user：", user);
     //*/
