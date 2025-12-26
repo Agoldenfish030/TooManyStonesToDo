@@ -56,9 +56,9 @@ router.get("/getBoards", async(req, res)=>{
             boardList.push(board);
         }
 
-        const MainBoard = await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`);
         const mainBoardName = "";
         if(mainBoardID != "-"){
+            const MainBoard = await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`);
             if(!MainBoard.ok){
                 console.error("mainBoard獲取失敗");
                 if(MainBoard.status == 404){
@@ -71,7 +71,7 @@ router.get("/getBoards", async(req, res)=>{
                     return res.status(MainBoard.status).json(MainBoard.text);
                 }
             }else mainBoardName = await MainBoard.json().name;
-        }else mainBoardName = await MainBoard.json().name;
+        }
 
         const boardDatas = {
                 mainBoard: {
