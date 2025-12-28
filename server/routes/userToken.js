@@ -72,7 +72,6 @@ router.get("/getBoards", async(req, res)=>{
             }else{
                 const MainBoardName = await MainBoard.json();
                 mainBoardName = MainBoardName.name;
-                console.log("mainBoardName: ", mainBoardName);
             }
         }
 
@@ -160,7 +159,7 @@ router.put("/changeMainBoard", async(req, res)=>{
     const token = userToken.token;
     const id = userToken.userID;
 
-    const NewCardsList = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/?cards=incomplete&key=${process.env.APIKEY}&token=${token}`);
+    const NewCardsList = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}?cards=incomplete&key=${process.env.APIKEY}&token=${token}`);
     let newCardsList = [];
     if(!NewCardsList.ok){
         console.error("未成功獲取NewCardsList");
@@ -174,7 +173,6 @@ router.put("/changeMainBoard", async(req, res)=>{
     //delWebhook
     if(user.boardWebhook){
         oldWebhookID = user.boardWebhook.id;
-        console.log("oldWebhook: ", oldWebhookID);
         const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${token}`, {
             method: 'DELETE'
         });
