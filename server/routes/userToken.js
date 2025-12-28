@@ -39,11 +39,10 @@ router.get("/getBoards", async(req, res)=>{
         const user = await User.findOne({userID: id});
         const boardIDList = user.allBoardsID;
         const mainBoardID = user.mainBoardID;
-        const allCards = user.allCards;
 
-        const boardList = [];
-        for(let boardIndex in boardIDList){
-            const BoardData = await fetch(`https://api.trello.com/1/boards/${boardIDList[boardIndex]}?key=${process.env.APIKEY}&token=${token}`);
+        let boardList = [];
+        for(let boardID in boardIDList){
+            const BoardData = await fetch(`https://api.trello.com/1/boards/${boardID}?key=${process.env.APIKEY}&token=${token}`);
             if(!BoardData.ok){
                 console.error("BoardData獲取失敗");
                 return res.status(BoardData.status).json(BoardData.statusText);
@@ -56,7 +55,7 @@ router.get("/getBoards", async(req, res)=>{
             boardList.push(board);
         }
 
-        const mainBoardName = "";
+        let mainBoardName = "";
         if(mainBoardID != "-"){
             const MainBoard = await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`);
             if(!MainBoard.ok){
@@ -153,27 +152,24 @@ router.put("/changeMainBoard", async(req, res)=>{
     const state = req.body.userState;
     const newMainBoardID = req.body.mainBoardID;
 
-    const NewCardsList = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/?cards=incomplete`);
+    const userToken = await Token.findOne({state: state});
+    const token = userToken.token;
+    const id = userToken.userID;
+
+    const NewCardsList = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/?cards=incomplete&key=${process.env.APIKEY}&token=${token}`);
     let newCardsList = [];
     if(!NewCardsList.ok){
         console.error("未成功獲取NewCardsList");
         if(NewCardsList.status != 404) return res.status(NewCardsList.status).json(NewCardsList.statusText);
     }else newCardsList = await NewCardsList.json();
 
-    const userToken = await Token.findOne({state: state});
-    const token = userToken.token;
-    const id = userToken.userID;
-
     const user = await User.findOne({userID: id});
-    const oldMainBoardID = user.mainBoardID;
     let oldWebhookID = "";
-    if(!user.boardWebhook){
-        console.log("用戶" + id + "為初次進入，請忽略404");
-    }else oldWebhookID = user.boardWebhook.id;
 
     console.log("用戶" + id + "即將更新webhook...");
     //delWebhook
-    if(oldMainBoardID != "-"){
+    if(user.boardWebhook){
+        oldWebhookID = user.boardWebhook.id;
         const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${token}`, {
             method: 'DELETE'
         });
