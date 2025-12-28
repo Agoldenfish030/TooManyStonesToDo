@@ -176,12 +176,15 @@ router.put("/changeMainBoard", async(req, res)=>{
     //delWebhook
     if(user.boardWebhook){
         oldWebhookID = user.boardWebhook.id;
-        const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${process.env.APITOKEN}`, {
+        const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${token}`, {
             method: 'DELETE'
         });
         if(!response2.ok){
-            console.error("刪除webhook失敗！");
-            return res.status(response2.status).json(response2.statusText);
+            if(response2.status == 404) console.log("用戶" + id + "webhook已被刪除！");
+            else{
+                console.error("刪除webhook失敗！");
+                return res.status(response2.status).json(response2.statusText);
+            }
         }
         console.log("用戶" + id + "之舊webhook刪除成功！");
     }
