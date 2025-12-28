@@ -173,7 +173,7 @@ router.put("/changeMainBoard", async(req, res)=>{
     //delWebhook
     if(user.boardWebhook){
         oldWebhookID = user.boardWebhook.id;
-        const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${token}`, {
+        const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${process.env.APITOKEN}`, {
             method: 'DELETE'
         });
         if(!response2.ok){
