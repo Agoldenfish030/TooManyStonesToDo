@@ -41,7 +41,7 @@ router.get("/getBoards", async(req, res)=>{
         const mainBoardID = user.mainBoardID;
 
         let boardList = [];
-        for(let boardID in boardIDList){
+        for(let boardID of boardIDList){
             const BoardData = await fetch(`https://api.trello.com/1/boards/${boardID}?key=${process.env.APIKEY}&token=${token}`);
             if(!BoardData.ok){
                 console.error("BoardData獲取失敗");
