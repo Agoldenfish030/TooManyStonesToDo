@@ -69,7 +69,11 @@ router.get("/getBoards", async(req, res)=>{
                 }else{
                     return res.status(MainBoard.status).json(MainBoard.statusText);
                 }
-            }else mainBoardName = await MainBoard.json().name;
+            }else{
+                const MainBoardName = await MainBoard.json();
+                mainBoardName = MainBoardName.name;
+                console.log("mainBoardName: ", mainBoardName);
+            }
         }
 
         const boardDatas = {
@@ -170,6 +174,7 @@ router.put("/changeMainBoard", async(req, res)=>{
     //delWebhook
     if(user.boardWebhook){
         oldWebhookID = user.boardWebhook.id;
+        console.log("oldWebhook: ", oldWebhookID);
         const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${token}`, {
             method: 'DELETE'
         });
