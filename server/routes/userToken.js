@@ -159,12 +159,15 @@ router.put("/changeMainBoard", async(req, res)=>{
     const token = userToken.token;
     const id = userToken.userID;
 
-    const NewCardsList = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}?cards=incomplete&key=${process.env.APIKEY}&token=${token}`);
+    const response5 = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}?cards=incomplete&key=${process.env.APIKEY}&token=${token}`);
     let newCardsList = [];
-    if(!NewCardsList.ok){
+    if(!response5.ok){
         console.error("未成功獲取NewCardsList");
-        if(NewCardsList.status != 404) return res.status(NewCardsList.status).json(NewCardsList.statusText);
-    }else newCardsList = await NewCardsList.json();
+        if(response5.status != 404) return res.status(response5.status).json(response5.statusText);
+    }else{
+        const NewCardsList = await response5.json();
+        newCardsList = NewCardsList.cards;
+    }
 
     const user = await User.findOne({userID: id});
     let oldWebhookID = "";
