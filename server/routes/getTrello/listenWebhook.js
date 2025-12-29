@@ -14,9 +14,9 @@ router.post("/", async(req, res)=>{
             const response = req.body;
             const action = response.action;
             const model = response.model;
-            const webhook = response.webhook;
+            const webhook = response.webhook; const webhookID = webhook.id;
 
-            const found = await User.findOne({ "boardWebhook.id": "webhook.id" });
+            const found = await User.findOne({ "boardWebhook.id": webhookID });
             if(!found){
                 console.error("有未刪除的webhook！id：", webhook.id);
                 return res.status(410);
