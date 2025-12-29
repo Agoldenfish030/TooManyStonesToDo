@@ -65,6 +65,7 @@ router.get("/getBoards", async(req, res)=>{
                     user.mainBoardID = "-";
                     user.allCards = [];
                     user.boardWebhook = null;
+                    user.webhookToken = null;
                     await user.save();
                 }else{
                     return res.status(MainBoard.status).json(MainBoard.statusText);
@@ -176,7 +177,8 @@ router.put("/changeMainBoard", async(req, res)=>{
     //delWebhook
     if(user.boardWebhook){
         oldWebhookID = user.boardWebhook.id;
-        const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${token}`, {
+        const oldWebhookToken = user.webhookToken;
+        const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${oldWebhookToken}`, {
             method: 'DELETE'
         });
         if(!response2.ok){
@@ -207,6 +209,7 @@ router.put("/changeMainBoard", async(req, res)=>{
     user.mainBoardID = newMainBoardID;
     user.allCards = newCardsList;
     user.boardWebhook = newWebhook;
+    user.webhookToken = token;
     await user.save();
     ///*
     console.log("回傳卡牌並更新使用者資訊user：", user);
