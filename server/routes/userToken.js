@@ -171,26 +171,8 @@ router.put("/changeMainBoard", async(req, res)=>{
     }
 
     const user = await User.findOne({userID: id});
-    let oldWebhookID = "";
 
     console.log("用戶" + id + "即將更新webhook...");
-    //delWebhook
-    if(user.boardWebhook){
-        oldWebhookID = user.boardWebhook.id;
-        const oldWebhookToken = user.webhookToken;
-        const response2 = await fetch(`https://api.trello.com/1/webhooks/${oldWebhookID}?key=${process.env.APIKEY}&token=${oldWebhookToken}`, {
-            method: 'DELETE'
-        });
-        if(!response2.ok){
-            if(response2.status == 404) console.log("用戶" + id + "webhook已被刪除！");
-            else{
-                console.error("刪除webhook失敗！");
-                return res.status(response2.status).json(response2.statusText);
-            }
-        }
-        console.log("用戶" + id + "之舊webhook刪除成功！");
-    }
-
     //getWebhook
     const callbackURL = "https://toomuchstonestodo.onrender.com/listenWebhook";
     const response3 = await fetch(`https://api.trello.com/1/webhooks/?callbackURL=${callbackURL}&idModel=${newMainBoardID}&key=${process.env.APIKEY}&token=${token}`, {
