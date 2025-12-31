@@ -23,12 +23,10 @@ router.post("/", async(req, res)=>{
             }
             const boardID = model.id;
             ///* for check content of the data
-            console.log(
-                "正確收到webhook request！\n" +
-                `action: ${action}\n` +
-                `model: ${model}\n` +
-                `webhook: ${webhook}`
-            );
+            console.log("正確收到webhook request！");
+            console.log(`action: ${action}`);
+            console.log(`model: ${model}`);
+            console.log(`webhook: ${webhook}`);
             //*/
 
             //action in need:

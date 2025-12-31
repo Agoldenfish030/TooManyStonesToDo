@@ -15,10 +15,16 @@ const userSchema = new mongoose.Schema({
       type: String,
       required: true
     },
-    allBoardsID: {
-      type: [String],
-      required: true
-    },
+    allBoardDatas: [{
+      boardID:{
+        type: String,
+        required: true
+      },
+      webhookToken: {
+        type: String,
+        required: true
+      }
+    }],
     allCards: {
       type: [Object],
       required: true
@@ -26,12 +32,8 @@ const userSchema = new mongoose.Schema({
     boardWebhook: {
       type: Object,
       required: false
-    },
-    webhookToken: {
-      type: String,
-      required: false
     }
-}, {collection: 'userDatas'});
+}, {collection: 'userDatas'}, {_id: false});
 const User = mongoose.model('User', userSchema);
 
 module.exports = {User, router};

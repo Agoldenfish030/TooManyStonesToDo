@@ -23,7 +23,7 @@ const tokenSchema = new mongoose.Schema({
         type: String,
         required: true
     }
-}, {collection: 'userTokens'});
+}, {collection: 'userTokens'}, {_id: false});
 const Token = mongoose.model('Token', tokenSchema);
 
 router.get("/getBoards", async(req, res)=>{
@@ -37,11 +37,13 @@ router.get("/getBoards", async(req, res)=>{
         const token = userToken.token;
 
         const user = await User.findOne({userID: id});
-        const boardIDList = user.allBoardsID;
+        const allBoardDatas = user.allBoardDatas;
         const mainBoardID = user.mainBoardID;
 
+        //call board name
         let boardList = [];
-        for(let boardID of boardIDList){
+        for(let boardItem of allBoardDatas){
+            const boardID = boardItem.boardID;
             const BoardData = await fetch(`https://api.trello.com/1/boards/${boardID}?key=${process.env.APIKEY}&token=${token}`);
             if(!BoardData.ok){
                 console.error("BoardData獲取失敗");
@@ -55,6 +57,8 @@ router.get("/getBoards", async(req, res)=>{
             boardList.push(board);
         }
 
+        //check mainBoard if exists now or not
+        //if not, then initialize it
         let mainBoardName = "";
         if(mainBoardID != "-"){
             const MainBoard = await fetch(`https://api.trello.com/1/boards/${mainBoardID}?key=${process.env.APIKEY}&token=${token}`);
@@ -65,7 +69,6 @@ router.get("/getBoards", async(req, res)=>{
                     user.mainBoardID = "-";
                     user.allCards = [];
                     user.boardWebhook = null;
-                    user.webhookToken = null;
                     await user.save();
                 }else{
                     return res.status(MainBoard.status).json(MainBoard.statusText);
@@ -116,11 +119,18 @@ router.post("/", async(req, res)=>{
         const found = await User.findOne({userID: resID});
         if(!found){
             const boardList = resUser.idBoards;
+            const boardDatas = [];
+            for(let i in boardList){
+                const boardID = boardList[i];
+                boardDatas.push({
+                    boardID: boardID,
+                    webhookToken: ""
+                });
+            }
             const user = new User({
                 userID: resID,
-                haveBoard: false,
                 mainBoardID: "-",
-                allBoardsID: boardList,
+                allBoardDatas: boardDatas,
                 allCards: []
             });
             const newUser = await user.save();
@@ -150,53 +160,64 @@ router.post("/", async(req, res)=>{
 });
 
 router.put("/changeMainBoard", async(req, res)=>{
-    ///*
-    console.log("呼叫changeMainBoard成功！");
-    //*/
-    const state = req.body.userState;
-    const newMainBoardID = req.body.mainBoardID;
+    try{
+        ///*
+        console.log("呼叫changeMainBoard成功！");
+        //*/
+        const state = req.body.userState;
+        const newMainBoardID = req.body.mainBoardID;
 
-    const userToken = await Token.findOne({state: state});
-    const token = userToken.token;
-    const id = userToken.userID;
+        const userToken = await Token.findOne({state: state});
+        const token = userToken.token;
+        const id = userToken.userID;
 
-    const response5 = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}?cards=incomplete&key=${process.env.APIKEY}&token=${token}`);
-    let newCardsList = [];
-    if(!response5.ok){
-        console.error("未成功獲取NewCardsList");
-        if(response5.status != 404) return res.status(response5.status).json(response5.statusText);
-    }else{
-        const NewCardsList = await response5.json();
-        newCardsList = NewCardsList.cards;
+        const response5 = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}?cards=incomplete&key=${process.env.APIKEY}&token=${token}`);
+        let newCardsList = [];
+        if(!response5.ok){
+            console.error("未成功獲取NewCardsList");
+            if(response5.status != 404) return res.status(response5.status).json(response5.statusText);
+        }else{
+            const NewCardsList = await response5.json();
+            newCardsList = NewCardsList.cards;
+        }
+
+        const user = await User.findOne({userID: id});
+        const oldMainBoardID = user.mainBoardID;
+        const boardDataIndex = user.allBoardDatas.findIndex(item => item.boardID === oldMainBoardID);
+        const boardData = user.allBoardDatas[boardDataIndex];
+
+        console.log("用戶" + id + "即將更新webhook...");
+        if(boardData.webhookToken != token){
+            //getWebhook
+            const callbackURL = "https://toomuchstonestodo.onrender.com/listenWebhook";
+            const response3 = await fetch(`https://api.trello.com/1/webhooks/?callbackURL=${callbackURL}&idModel=${newMainBoardID}&key=${process.env.APIKEY}&token=${token}`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                });
+            if(!response3.ok){
+                console.error("獲得webhook失敗！");
+                return res.status(response3.status).json(response3.statusText);
+            }
+            console.log("成功取得" + id + "之webhook！");
+            const newWebhook = await response3.json();
+
+            boardData.webhookToken = token;
+            user.allBoardDatas[boardDataIndex] = boardData;
+            user.boardWebhook = newWebhook;
+        }else console.log("已擁有webhook，用戶不需更新webhook！");
+
+        user.mainBoardID = newMainBoardID;
+        user.allCards = newCardsList;
+        await user.save();
+        ///*
+        console.log("回傳卡牌並更新使用者資訊user：", user);
+        //*/
+        res.status(200).json(newCardsList);
+    }catch(err){
+        res.status(500).json({message: err.message});
     }
-
-    const user = await User.findOne({userID: id});
-
-    console.log("用戶" + id + "即將更新webhook...");
-    //getWebhook
-    const callbackURL = "https://toomuchstonestodo.onrender.com/listenWebhook";
-    const response3 = await fetch(`https://api.trello.com/1/webhooks/?callbackURL=${callbackURL}&idModel=${newMainBoardID}&key=${process.env.APIKEY}&token=${token}`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json'
-            },
-        });
-    if(!response3.ok){
-        console.error("獲得webhook失敗！");
-        return res.status(response3.status).json(response3.statusText);
-    }
-    console.log("成功取得" + id + "之webhook！");
-    const newWebhook = await response3.json();
-    
-    user.mainBoardID = newMainBoardID;
-    user.allCards = newCardsList;
-    user.boardWebhook = newWebhook;
-    user.webhookToken = token;
-    await user.save();
-    ///*
-    console.log("回傳卡牌並更新使用者資訊user：", user);
-    //*/
-    res.status(200).json(newCardsList);
 });
 
 module.exports = {Token, router};
