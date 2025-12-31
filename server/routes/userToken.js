@@ -160,7 +160,7 @@ router.post("/", async(req, res)=>{
 });
 
 router.put("/changeMainBoard", async(req, res)=>{
-    try{
+    //try{
         ///*
         console.log("呼叫changeMainBoard成功！");
         //*/
@@ -215,9 +215,9 @@ router.put("/changeMainBoard", async(req, res)=>{
         console.log("回傳卡牌並更新使用者資訊user：", user);
         //*/
         res.status(200).json(newCardsList);
-    }catch(err){
-        res.status(500).json({message: err.message});
-    }
+    //}catch(err){
+    //    res.status(500).json({message: err.message});
+    //}
 });
 
 module.exports = {Token, router};
