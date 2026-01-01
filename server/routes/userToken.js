@@ -182,15 +182,8 @@ router.put("/changeMainBoard", async(req, res)=>{
         }
 
         const user = await User.findOne({userID: id});
-        const oldMainBoardID = user.mainBoardID;
-        const boardDataIndex = user.allBoardDatas.findIndex(item => item.boardID === oldMainBoardID);
-        let boardData = {
-            boardID: "",
-            webhookToken: ""
-        };
-        if(user.allBoardDatas[boardDataIndex]){
-            boardData = user.allBoardDatas[boardDataIndex];
-        }
+        const boardDataIndex = user.allBoardDatas.findIndex(item => item.boardID === newMainBoardID);
+        const boardData = user.allBoardDatas[boardDataIndex];
 
         console.log("用戶" + id + "即將更新webhook...");
         if(token != boardData.webhookToken){
