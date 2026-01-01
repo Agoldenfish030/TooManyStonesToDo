@@ -187,7 +187,7 @@ router.put("/changeMainBoard", async(req, res)=>{
         const boardData = user.allBoardDatas[boardDataIndex];
 
         console.log("用戶" + id + "即將更新webhook...");
-        if(token != boardData.webhookToken){
+        if(!boardData || token != boardData.webhookToken){
             //getWebhook
             const callbackURL = "https://toomuchstonestodo.onrender.com/listenWebhook";
             const response3 = await fetch(`https://api.trello.com/1/webhooks/?callbackURL=${callbackURL}&idModel=${newMainBoardID}&key=${process.env.APIKEY}&token=${token}`, {
