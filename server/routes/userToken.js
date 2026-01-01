@@ -184,10 +184,16 @@ router.put("/changeMainBoard", async(req, res)=>{
         const user = await User.findOne({userID: id});
         const oldMainBoardID = user.mainBoardID;
         const boardDataIndex = user.allBoardDatas.findIndex(item => item.boardID === oldMainBoardID);
-        const boardData = user.allBoardDatas[boardDataIndex];
+        const boardData = {
+            boardID: "",
+            webhookToken: ""
+        };
+        if(user.allBoardDatas[boardDataIndex]){
+            boardData = user.allBoardDatas[boardDataIndex];
+        }
 
         console.log("用戶" + id + "即將更新webhook...");
-        if(!boardData || token != boardData.webhookToken){
+        if(token != boardData.webhookToken){
             //getWebhook
             const callbackURL = "https://toomuchstonestodo.onrender.com/listenWebhook";
             const response3 = await fetch(`https://api.trello.com/1/webhooks/?callbackURL=${callbackURL}&idModel=${newMainBoardID}&key=${process.env.APIKEY}&token=${token}`, {
@@ -202,6 +208,7 @@ router.put("/changeMainBoard", async(req, res)=>{
             }
             console.log("成功取得" + id + "之webhook！");
             const newWebhook = await response3.json();
+            console.log("獲得之webhook: ", newWebhook);
 
             boardData.webhookToken = token;
             user.allBoardDatas[boardDataIndex] = boardData;
