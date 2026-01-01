@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema({
       webhookToken: {
         type: String,
         required: true
+      },
+      webhookID: {
+        type: String,
+        required: true
       }
     }],
     allCards: {

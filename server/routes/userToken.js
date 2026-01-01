@@ -124,7 +124,8 @@ router.post("/", async(req, res)=>{
                 const boardID = boardList[i];
                 boardDatas.push({
                     boardID: boardID,
-                    webhookToken: "-"
+                    webhookToken: "-",
+                    webhookID: "-"
                 });
             }
             const user = new User({
@@ -204,9 +205,20 @@ router.put("/changeMainBoard", async(req, res)=>{
             console.log("獲得之webhook: ", newWebhook);
 
             boardData.webhookToken = token;
+            boardData.webhookID = newWebhook.id;
             user.allBoardDatas[boardDataIndex] = boardData;
             user.boardWebhook = newWebhook;
-        }else console.log("已擁有webhook，用戶不需更新webhook！");
+        }else{
+            console.log("已擁有webhook，用戶不需更新webhook！");
+            const response2 = await fetch(`https://api.trello.com/1/webhooks${boardData.webhookID}?key=${process.env.APIKEY}&token=${token}`);
+            if(!response2.ok){
+                console.error("更新db之webhook失敗！");
+                return res.status(response2.status).json(response2.statusText);
+            }
+            const newWebhook = await response2.json();
+            console.log("更新db之webhook: ", newWebhook);
+            user.boardWebhook = newWebhook;
+        }
 
         user.mainBoardID = newMainBoardID;
         user.allCards = newCardsList;
