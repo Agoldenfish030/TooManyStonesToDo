@@ -184,7 +184,7 @@ router.put("/changeMainBoard", async(req, res)=>{
         const user = await User.findOne({userID: id});
         const oldMainBoardID = user.mainBoardID;
         const boardDataIndex = user.allBoardDatas.findIndex(item => item.boardID === oldMainBoardID);
-        const boardData = {
+        let boardData = {
             boardID: "",
             webhookToken: ""
         };
