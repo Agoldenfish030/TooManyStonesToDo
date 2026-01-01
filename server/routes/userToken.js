@@ -210,7 +210,7 @@ router.put("/changeMainBoard", async(req, res)=>{
             user.boardWebhook = newWebhook;
         }else{
             console.log("已擁有webhook，用戶不需更新webhook！");
-            const response2 = await fetch(`https://api.trello.com/1/webhooks${boardData.webhookID}?key=${process.env.APIKEY}&token=${token}`);
+            const response2 = await fetch(`https://api.trello.com/1/webhooks/${boardData.webhookID}?key=${process.env.APIKEY}&token=${token}`);
             if(!response2.ok){
                 console.error("更新db之webhook失敗！");
                 return res.status(response2.status).json(response2.statusText);
