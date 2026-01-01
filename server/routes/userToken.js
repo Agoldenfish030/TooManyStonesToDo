@@ -124,7 +124,7 @@ router.post("/", async(req, res)=>{
                 const boardID = boardList[i];
                 boardDatas.push({
                     boardID: boardID,
-                    webhookToken: ""
+                    webhookToken: "-"
                 });
             }
             const user = new User({

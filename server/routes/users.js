@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
       },
       webhookToken: {
         type: String,
-        required: false
+        required: true
       }
     }],
     allCards: {
