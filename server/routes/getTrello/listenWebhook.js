@@ -55,6 +55,12 @@ router.post("/", async(req, res)=>{
                     cardDue: action.data.card.due
                 });
             }else if(action.type == "updateCard"){ //spectial: updateCard
+                io.emit('cardChange', {
+                    type: 'UPDATE',
+                    cardID: action.data.card.id,
+                    cardName: action.data.card.name,
+                    cardDue: action.data.card.due
+                });
             }
             //*/
             res.status(200).send();

@@ -180,12 +180,14 @@ router.put("/changeMainBoard", async(req, res)=>{
             if(response5.status != 404) return res.status(response5.status).json(response5.statusText);
         }else{
             const NewCardsList = await response5.json();
-            const newCard = {
-                id: NewCardsList.id,
-                name: NewCardsList.name,
-                due: NewCardsList.due
+            for(let NewCard of NewCardsList){
+                const newCard = {
+                    id: NewCard.id,
+                    name: NewCard.name,
+                    due: NewCard.due
+                }
+                newCardsList.push(newCard);
             }
-            newCardsList.push(newCard);
         }
 
         const user = await User.findOne({userID: id});
