@@ -14,8 +14,8 @@ router.post("/", async(req, res)=>{
         if(verifyWebhook(req, 'https://toomuchstonestodo.onrender.com/listenWebhook')){
             const response = req.body;
             const action = response.action;
-            const model = response.model;
             const webhook = response.webhook; const webhookID = webhook.id;
+            const io = socketHandler.getIO;
 
             const found = await User.findOne({ "boardWebhook.id": webhookID });
             if(!found){
@@ -25,25 +25,38 @@ router.post("/", async(req, res)=>{
             ///* for check content of the data
             console.log("正確收到webhook request！");
             console.log("action: ", action);
-            console.log("model: ", model);
             console.log("webhook: ", webhook);
             //*/
 
+            /*
             //action in need:
-            //add:createCard, copyCard, moveCardToBoard, emailCard, convertToCardFromCheckItem, *updateCard
-            //if(action.type == "copyCard" ||
-            //    action.type == "moveCardToBoard" ||
-            //    action.type == "emailCard" ||
-            //    action.type == "convertToCardFromCheckItem"
-            //){
-            //    io.emit('cardChange', {
-            //        type: 'ADD',
-            //        cardID: action.data.card.id,
-            //        cardName: action.data.card.name,
-            //    });
-            //}
-            //delete:deleteCard, moveCardFromBoard, *updateCard
-
+            //add: createCard, copyCard, moveCardToBoard, emailCard, convertToCardFromCheckItem
+            if(
+                action.type == "createCard" ||
+                action.type == "copyCard" ||
+                action.type == "moveCardToBoard" ||
+                action.type == "emailCard" ||
+                action.type == "convertToCardFromCheckItem"
+            ){
+                io.emit('cardChange', {
+                    type: 'ADD',
+                    cardID: action.data.card.id,
+                    cardName: action.data.card.name,
+                    cardDue: action.data.card.due
+                });
+            }else if( //delete: deleteCard, moveCardFromBoard
+                action.type == "deleteCard" ||
+                action.type == "moveCardFromBoard"
+            ){
+                io.emit('cardChange', {
+                    type: 'DELETE',
+                    cardID: action.data.card.id,
+                    cardName: action.data.card.name,
+                    cardDue: action.data.card.due
+                });
+            }else if(action.type == "updateCard"){ //spectial: updateCard
+            }
+            //*/
             res.status(200).send();
         }else{
             res.status(400).send();
