@@ -167,12 +167,13 @@ router.put("/changeMainBoard", async(req, res)=>{
         //*/
         const state = req.body.userState;
         const newMainBoardID = req.body.mainBoardID;
+        const timestamp = Date.now();
 
         const userToken = await Token.findOne({state: state});
         const token = userToken.token;
         const id = userToken.userID;
 
-        const response5 = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/cards?key=${process.env.APIKEY}&token=${token}`);
+        const response5 = await fetch(`https://api.trello.com/1/boards/${newMainBoardID}/cards?key=${process.env.APIKEY}&token=${token}&t=${timestamp}`);
         let newCardsList = [];
         if(!response5.ok){
             console.error("未成功獲取NewCardsList");
