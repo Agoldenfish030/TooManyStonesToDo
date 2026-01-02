@@ -46,7 +46,7 @@ router.get("/getBoards", async(req, res)=>{
             const boardID = boardItem.boardID;
             const BoardData = await fetch(`https://api.trello.com/1/boards/${boardID}?key=${process.env.APIKEY}&token=${token}`);
             if(!BoardData.ok){
-                console.error("BoardData獲取失敗");
+                console.error("BoardData獲取失敗！");
                 return res.status(BoardData.status).json(BoardData.statusText);
             }
             const boardData = await BoardData.json();
@@ -132,7 +132,8 @@ router.post("/", async(req, res)=>{
                 userID: resID,
                 mainBoardID: "-",
                 allBoardDatas: boardDatas,
-                allCards: []
+                allCards: [],
+                listID: "-"
             });
             const newUser = await user.save();
             console.log("儲存user成功: ", newUser);
@@ -184,7 +185,8 @@ router.put("/changeMainBoard", async(req, res)=>{
                 const newCard = {
                     id: NewCard.id,
                     name: NewCard.name,
-                    due: NewCard.due
+                    due: NewCard.due,
+                    dueComplete: NewCard.dueComplete
                 }
                 newCardsList.push(newCard);
             }
@@ -198,7 +200,7 @@ router.put("/changeMainBoard", async(req, res)=>{
         if(token != boardData.webhookToken){
             //getWebhook
             const callbackURL = "https://toomuchstonestodo.onrender.com/listenWebhook";
-            const response3 = await fetch(`https://api.trello.com/1/webhooks/?callbackURL=${callbackURL}&idModel=${newMainBoardID}&key=${process.env.APIKEY}&token=${token}`, {
+            const response3 = await fetch(`https://api.trello.com/1/webhooks/?callbackURL=${callbackURL}&idModel=${newMainBoardID}&description=boardDataIndex${boardDataIndex}&key=${process.env.APIKEY}&token=${token}`, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json'
@@ -238,6 +240,125 @@ router.put("/changeMainBoard", async(req, res)=>{
     //}catch(err){
     //    res.status(500).json({message: err.message});
     //}
+});
+
+router.put("/requestTrello", async(req, res)=>{
+    const state = req.body.state;
+    const type = req.body.type;
+    const id = req.body.id;
+    const name = req.body.name;
+    const due = req.body.due;
+    const dueComplete = req.body.dueComplete;
+
+    try{
+        const userToken = await Token.findOne({state: state});
+        const user = await User.findOne({userID: userToken.userID});
+
+        if(user.listID == "-"){
+            const List = await fetch(`https://api.trello.com/1/lists?name=fromTooMuchStonesToDo&idBoard=${user.mainBoardID}&key=${process.env.APIKEY}&token=${userToken.token}`, {
+                method: 'POST'
+            });
+            if(!List.ok){
+                console.error("List獲取失敗！");
+                return res.status(List.status).json(List.statusText);
+            }
+            const reList = await List.json();
+            user.listID = reList.id;
+            await user.save();
+        }else{
+            const found = await fetch(`https://api.trello.com/1/lists/${user.listID}?key=${process.env.APIKEY}&token=${userToken.token}`, {
+                method: 'GET'
+            });
+            if(!found.ok){
+                console.error("獲取list失敗！");
+                if(found.status == 404){
+                    console.error("用戶" + user.userID + "之list已遭刪除！即將重新生成");
+                    const List = await fetch(`https://api.trello.com/1/lists?name=fromTooMuchStonesToDo&idBoard=${user.mainBoardID}&key=${process.env.APIKEY}&token=${userToken.token}`, {
+                        method: 'POST'
+                    });
+                    if(!List.ok){
+                        console.error("List獲取失敗！");
+                        return res.status(List.status).json(List.statusText);
+                    }
+                    const reList = await List.json();
+                    user.listID = reList.id;
+                    await user.save();
+                }else{
+                    return res.status(found.status).json(found.statusText);
+                }
+            }
+        }
+
+        if(type == 'ADD'){
+            const response4 = await fetch(`https://api.trello.com/1/cards?idList=${user.listID}&name=${name}&due=${due}&key=${process.env.APIKEY}&token=${userToken.token}`, {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json'
+                }
+            });
+            if(!response4.ok){
+                console.error("向trello請求POST失敗！");
+                return res.status(response4.status).json(response4.statusText);
+            }else console.log("向trello請求POST成功！");
+
+            user.allCards.push({
+                id: response4.id,
+                name: name,
+                due: due,
+                dueComplete: dueComplete
+            });
+
+        }else if(type == 'DELETE'){
+            const response4 = await fetch(`https://api.trello.com/1/cards/${id}?key=${process.env.APIKEY}&token=${userToken.token}`, {
+                method: 'DELETE'
+            })
+            if(!response4.ok){
+                console.error("向trello請求DELETE失敗！");
+                return res.status(response4.status).json(response4.statusText);
+            }else console.log("向trello請求DELETE成功！");
+
+            const newCardsList = user.allCards.filter({
+                id: id,
+                name: name,
+                due: due,
+                dueComplete: dueComplete
+            });
+            user.allCards = newCardsList;
+
+        }else if(type == 'UPDATE'){
+            const response4 = await fetch(`https://api.trello.com/1/cards/${id}?key=${process.env.APIKEY}&token=${userToken.token}`, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            if(!response4.ok){
+                console.error("向trello請求PUT失敗！");
+                return res.status(response4.status).json(response4.statusText);
+            }else console.log("向trello請求PUT成功！");
+
+            const newCardsList = user.allCards.map((item)=>{
+                if(item.id === id){
+                    return {
+                        id: id,
+                        name: name,
+                        due: due,
+                        dueComplete: dueComplete
+                    };
+                }
+                return item;
+            });
+            user.allCards = newCardsList;
+
+        }else{
+            return res.status(400).json({message: "發送內容有誤！"});
+        }
+
+        await user.save();
+        res.status(200).json({message: "成功更新db且向trello發出請求！"});
+    }catch(err){
+        res.status(500).json({message: err.message});
+    }
 });
 
 module.exports = {Token, router};

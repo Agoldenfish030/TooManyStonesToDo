@@ -17,8 +17,8 @@ router.post("/", async(req, res)=>{
             const webhook = response.webhook; const webhookID = webhook.id;
             const io = socketHandler.getIO;
 
-            const found = await User.findOne({ "boardWebhook.id": webhookID });
-            if(!found){
+            const foundUser = await User.findOne({ "boardWebhook.id": webhookID });
+            if(!foundUser){
                 console.error("有未刪除的webhook！id：", webhook.id);
                 return res.status(410).send();
             }
@@ -28,7 +28,14 @@ router.post("/", async(req, res)=>{
             console.log("webhook: ", webhook);
             //*/
 
-            /*
+            ///*
+            let cardData = {
+                type: '',
+                cardID: action.data.card.id,
+                cardName: action.data.card.name,
+                cardDue: action.data.card.due,
+                cardComplete: action.data.card.dueComplete
+            };
             //action in need:
             //add: createCard, copyCard, moveCardToBoard, emailCard, convertToCardFromCheckItem
             if(
@@ -38,29 +45,51 @@ router.post("/", async(req, res)=>{
                 action.type == "emailCard" ||
                 action.type == "convertToCardFromCheckItem"
             ){
-                io.emit('cardChange', {
-                    type: 'ADD',
-                    cardID: action.data.card.id,
-                    cardName: action.data.card.name,
-                    cardDue: action.data.card.due
+                foundUser.allCards.push({
+                    id: cardData.id,
+                    name: cardData.name,
+                    due: cardData.due,
+                    dueComplete: cardData.dueComplete
                 });
+                await foundUser.save();
+
+                cardData.type = 'ADD';
+                io.emit('cardChange', cardData);
+                
             }else if( //delete: deleteCard, moveCardFromBoard
                 action.type == "deleteCard" ||
                 action.type == "moveCardFromBoard"
             ){
-                io.emit('cardChange', {
-                    type: 'DELETE',
-                    cardID: action.data.card.id,
-                    cardName: action.data.card.name,
-                    cardDue: action.data.card.due
+                const newCardsList = foundUser.allCards.filter({
+                    id: cardData.cardID,
+                    name: cardData.cardName,
+                    due: cardData.cardDue,
+                    dueComplete: NewCard.dueComplete
                 });
+                foundUser.allCards = newCardsList;
+                await foundUser.save();
+
+                cardData.type = 'DELETE';
+                io.emit('cardChange', cardData);
+
             }else if(action.type == "updateCard"){ //spectial: updateCard
-                io.emit('cardChange', {
-                    type: 'UPDATE',
-                    cardID: action.data.card.id,
-                    cardName: action.data.card.name,
-                    cardDue: action.data.card.due
-                });
+                if(
+                    action.data.old.name ||
+                    action.data.old.due ||
+                    action.data.old.dueComplete
+                ){
+                    const newCardsList = foundUser.allCards.map((item)=>{
+                        if(item.id === cardData.cardID){
+                            return cardData;
+                        }
+                        return item;
+                    });
+                    foundUser.allCards = newCardsList;
+                    await foundUser.save();
+
+                    cardData.type = 'UPDATE';
+                    io.emit('cardChange', cardData);
+                }
             }
             //*/
             res.status(200).send();
