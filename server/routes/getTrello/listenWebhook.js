@@ -64,7 +64,7 @@ router.post("/", async(req, res)=>{
                     id: cardData.cardID,
                     name: cardData.cardName,
                     due: cardData.cardDue,
-                    dueComplete: NewCard.dueComplete
+                    dueComplete: cardData.cardComplete
                 });
                 foundUser.allCards = newCardsList;
                 await foundUser.save();
@@ -80,7 +80,12 @@ router.post("/", async(req, res)=>{
                 ){
                     const newCardsList = foundUser.allCards.map((item)=>{
                         if(item.id === cardData.cardID){
-                            return cardData;
+                            return {
+                                id: cardData.cardID,
+                                name: cardData.cardName,
+                                due: cardData.cardDue,
+                                dueComplete: cardData.cardComplete
+                            }
                         }
                         return item;
                     });
