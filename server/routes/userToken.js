@@ -179,7 +179,13 @@ router.put("/changeMainBoard", async(req, res)=>{
             console.error("未成功獲取NewCardsList");
             if(response5.status != 404) return res.status(response5.status).json(response5.statusText);
         }else{
-            newCardsList = await response5.json();
+            const NewCardsList = await response5.json();
+            const newCard = {
+                id: NewCardsList.id,
+                name: NewCardsList.name,
+                due: NewCardsList.due
+            }
+            newCardsList.push(newCard);
         }
 
         const user = await User.findOne({userID: id});
