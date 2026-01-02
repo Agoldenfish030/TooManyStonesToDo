@@ -4,15 +4,24 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+//my lib
 const cors = require('cors');
+const http = require('http');
 
 var indexRouter = require('./routes/index');
+//my router
 const {router: usersRouter} = require('./routes/users');
 const logInLinkRouter = require('./routes/authorization/logInLink');
 const {router: tokenRouter} = require('./routes/userToken');
 const listenWebhookRouter = require('./routes/getTrello/listenWebhook');
+const socketHandler = require('./routes/getTrello/socketHandler');
 
 var app = express();
+//my server
+const server = http.createServer(app);
+
+//set Socket.io(it should put before routers)
+socketHandler.init(server);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -38,6 +47,11 @@ app.use('/users', usersRouter);
 app.use('/logInLink', logInLinkRouter);
 app.use('/userToken', tokenRouter);
 app.use('/listenWebhook', listenWebhookRouter);
+
+//server listen
+server.listen(3000, ()=>{
+  console.log('server在 Port 3000 啟動');
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

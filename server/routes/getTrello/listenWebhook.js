@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {User} = require('../users');
 const verifyWebhook = require('./verifyWebhook');
+const socketHandler = require('./socketHandler');
 
 router.head("/", async(req, res)=>{
     res.status(200).send();
@@ -19,9 +20,8 @@ router.post("/", async(req, res)=>{
             const found = await User.findOne({ "boardWebhook.id": webhookID });
             if(!found){
                 console.error("有未刪除的webhook！id：", webhook.id);
-                return res.status(410);
+                return res.status(410).send();
             }
-            const boardID = model.id;
             ///* for check content of the data
             console.log("正確收到webhook request！");
             console.log("action: ", action);
@@ -30,8 +30,19 @@ router.post("/", async(req, res)=>{
             //*/
 
             //action in need:
-            //add:createCard, copyCard, moveCardFromBoard, emailCard, convertToCardFromCheckItem, *updateCard
-            //delete:deleteCard, moveCardToBoard, *updateCard
+            //add:createCard, copyCard, moveCardToBoard, emailCard, convertToCardFromCheckItem, *updateCard
+            //if(action.type == "copyCard" ||
+            //    action.type == "moveCardToBoard" ||
+            //    action.type == "emailCard" ||
+            //    action.type == "convertToCardFromCheckItem"
+            //){
+            //    io.emit('cardChange', {
+            //        type: 'ADD',
+            //        cardID: action.data.card.id,
+            //        cardName: action.data.card.name,
+            //    });
+            //}
+            //delete:deleteCard, moveCardFromBoard, *updateCard
 
             res.status(200).send();
         }else{
