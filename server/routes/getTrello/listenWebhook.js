@@ -15,7 +15,7 @@ router.post("/", async(req, res)=>{
             const response = req.body;
             const action = response.action;
             const webhook = response.webhook; const webhookID = webhook.id;
-            const io = socketHandler.getIO;
+            const io = socketHandler.getIO();
 
             const foundUser = await User.findOne({ "boardWebhook.id": webhookID });
             if(!foundUser){

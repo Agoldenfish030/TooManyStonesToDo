@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('server:server');
 var http = require('http');
+const socketHandler = require('../routes/getTrello/socketHandler');
 
 /**
  * Get port from environment and store in Express.
@@ -17,9 +18,13 @@ app.set('port', port);
 
 /**
  * Create HTTP server.
+ * been changed.
  */
 
-var server = http.createServer(app);
+const server = http.createServer(app);
+
+//set Socket.io(it should put before routers)
+socketHandler.init(server);
 
 /**
  * Listen on provided port, on all network interfaces.
