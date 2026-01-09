@@ -5,7 +5,7 @@ const socketHandler = {
     init: (server)=>{
         io = new Server(server, {
             cors: {
-                origin: 'https://stonereact-client.vercel.app/'
+                origin: 'https://stonereact-client.vercel.app'
             }
         });
 
